@@ -27,6 +27,7 @@ repositories {
 }
 
 ext {
+    caffeineVersion = "3.2.3"
     liquibaseSessionLockVersion = "1.6.9"
     liquibaseVersion = "5.0.2"
     postgresVersion = "42.7.9"
@@ -49,6 +50,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-liquibase'
     implementation 'org.apache.httpcomponents.client5:httpclient5'
+    implementation "com.github.ben-manes.caffeine:caffeine:$caffeineVersion"
     implementation "com.github.blagerweij:liquibase-sessionlock:$liquibaseSessionLockVersion"
     implementation "net.lbruun.springboot:preliquibase-spring-boot-starter:$preliquibaseVersion"
     implementation "org.liquibase:liquibase-core:$liquibaseVersion"

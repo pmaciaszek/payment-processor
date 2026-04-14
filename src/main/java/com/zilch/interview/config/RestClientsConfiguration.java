@@ -2,6 +2,7 @@ package com.zilch.interview.config;
 
 import com.zilch.interview.client.handler.DummyDomainClientErrorHandler;
 import com.zilch.interview.config.properties.RestClientProperties;
+import com.zilch.interview.config.properties.RestClientsProperties;
 import com.zilch.interview.config.properties.dummyDomain.DummyDomainClientProperties;
 import lombok.RequiredArgsConstructor;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -24,9 +25,9 @@ public class RestClientsConfiguration {
     private final RestClient.Builder restClientBuilder;
 
     @Bean
-    public RestClient dummpyRestClient(DummyDomainClientProperties dummyDomainClientProperties,
+    public RestClient dummpyRestClient(RestClientsProperties restClientsProperties,
                                        DummyDomainClientErrorHandler dummyDomainClientErrorHandler) {
-        return restClientBuilder(dummyDomainClientProperties, dummyDomainClientErrorHandler)
+        return restClientBuilder(restClientsProperties.dummyDomain(), dummyDomainClientErrorHandler)
                 .build();
     }
 

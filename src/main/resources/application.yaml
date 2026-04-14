@@ -26,3 +26,6 @@ application:
     service:
       operationLock:
         maxRetries: 5
+        cache:
+          maxSize: 10_000
+          ttl: PT6H

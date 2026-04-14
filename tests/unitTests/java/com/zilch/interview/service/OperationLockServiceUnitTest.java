@@ -1,6 +1,8 @@
 package com.zilch.interview.service;
 
+import com.zilch.interview.config.properties.OperationLockServiceCacheProperties;
 import com.zilch.interview.config.properties.OperationLockServiceProperties;
+import com.zilch.interview.config.properties.ServicesProperties;
 import com.zilch.interview.model.PaymentResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,18 +10,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -36,7 +36,13 @@ class OperationLockServiceUnitTest {
 
     @BeforeEach
     void setUp() {
-        service = new OperationLockService( new OperationLockServiceProperties(5));
+        service = new OperationLockService(
+                new ServicesProperties(
+                        new OperationLockServiceProperties(
+                                5,
+                                new OperationLockServiceCacheProperties(
+                                        10,
+                                        Duration.of(5, ChronoUnit.MINUTES)))));
     }
 
     @Test
@@ -67,52 +73,24 @@ class OperationLockServiceUnitTest {
     }
 
     @Test
-    void shouldRetryUpTo5TimesOnFailedPaymentResult() throws InterruptedException {
+    void shouldRetryUpTo5TimesOnFailedPaymentResult() {
         // given
         var idempotencyKey = "retry-key";
-        AtomicInteger counter = new AtomicInteger(0);
-        int numberOfThreads = 20;
-        ExecutorService executor = Executors.newFixedThreadPool(numberOfThreads);
-        List<Callable<PaymentResult>> tasks = new ArrayList<>();
-
-        // Symulujemy wiele równoległych żądań
-        for (int i = 0; i < numberOfThreads; i++) {
-            tasks.add(() -> service.execute(idempotencyKey, () -> {
-                try {
-                    // Małe opóźnienie, aby wymusić rywalizację i sprawdzić działanie blokad
-                    Thread.sleep(50);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-                counter.incrementAndGet();
-                return new PaymentResult(false, "tx-failed-" + counter.get());
-            }));
-        }
+        var failedTransactionId = "transaction-failed";
+        when(supplier.get()).thenReturn(new PaymentResult(false, failedTransactionId));
 
         // when
-        List<Future<PaymentResult>> futures = executor.invokeAll(tasks);
-        executor.shutdown();
-        executor.awaitTermination(10, TimeUnit.SECONDS);
-
-        // then
-        for (Future<PaymentResult> future : futures) {
-            try {
-                assertThat(future.get().success()).isFalse();
-            } catch (ExecutionException e) {
-                throw new RuntimeException(e);
-            }
+        for( int i = 0; i<6; i++) {
+            service.execute(idempotencyKey, supplier);
         }
+        var lastResult = service.execute(idempotencyKey, supplier);
 
-        // Powinno być dokładnie 5 wywołań (1 początkowe + 4 retry = 5 prób łącznie)
-        assertThat(counter.get()).as("Powinno wywołać supplier dokładnie 5 razy łącznie").isEqualTo(5);
+        assertThat(lastResult)
+                .returns(false, PaymentResult::success)
+                .returns(failedTransactionId, PaymentResult::transactionId);
 
-        // 6-ta próba (po zakończeniu wątków) nie powinna już wywoływać supplier'a
-        PaymentResult result6 = service.execute(idempotencyKey, () -> {
-            counter.incrementAndGet();
-            return new PaymentResult(true, "tx-success");
-        });
-        assertThat(result6.success()).as("Powinno zwrócić scache'owany błąd po przekroczeniu limitu").isFalse();
-        assertThat(counter.get()).as("Nie powinno wywołać supplier'a po raz 6-ty").isEqualTo(5);
+        verify(supplier, times(5)).get();
+        verifyNoMoreInteractions(supplier);
     }
 
     @Test
@@ -137,5 +115,180 @@ class OperationLockServiceUnitTest {
 
         verify(supplier).get();
         verifyNoMoreInteractions(supplier);
+    }
+
+    @Test
+    void shouldHandleConcurrentRequestsWithRetryLimit() throws InterruptedException {
+        // given
+        var key = "concurrent-key";
+        var counter = new AtomicInteger(0);
+        try (var executor = Executors.newFixedThreadPool(10)) {
+            Supplier<PaymentResult> realSupplier = () -> {
+                var currentCounter = counter.incrementAndGet();
+                return new PaymentResult(false, "transaction-failed-" + currentCounter);
+            };
+
+            // when
+            var tasks = IntStream.range(0, 20)
+                    .<Callable<PaymentResult>>mapToObj(index -> () -> service.execute(key, realSupplier))
+                    .toList();
+
+            executor.invokeAll(tasks);
+        }
+
+        // then
+        assertAll(
+                () -> assertThat(counter.get())
+                        .isEqualTo(5),
+                () -> assertThat(service.execute(key, supplier))
+                        .returns(false, PaymentResult::success)
+                        .returns("transaction-failed-5", PaymentResult::transactionId));
+    }
+
+    @Test
+    void shouldIsolateCachePerKey() {
+        // given
+        var key1 = "key1";
+        var key2 = "key2";
+        var transactionId1 = "transaction-1";
+        var transactionId2Failed = "transaction-2-failed";
+        var transactionId2Success = "transaction-2-succeed";
+        when(supplier.get()).thenReturn(
+                new PaymentResult(true, transactionId1),
+                new PaymentResult(false, transactionId2Failed),
+                new PaymentResult(true, transactionId2Success));
+
+        // when
+        var result1 = service.execute(key1, supplier);
+        var result2 = service.execute(key2, supplier);
+        var cachedResult1 = service.execute(key1, supplier);
+        var retryResult2 = service.execute(key2, supplier);
+
+        // then
+        assertAll(
+                () -> assertThat(result1)
+                        .returns(true, PaymentResult::success)
+                        .returns(transactionId1, PaymentResult::transactionId)
+                        .isEqualTo(cachedResult1),
+                () -> assertThat(result2)
+                        .returns(false, PaymentResult::success)
+                        .returns(transactionId2Failed, PaymentResult::transactionId),
+                () -> assertThat(retryResult2)
+                        .returns(true, PaymentResult::success)
+                        .returns(transactionId2Success, PaymentResult::transactionId));
+
+        verify(supplier, times(3)).get();
+        verifyNoMoreInteractions(supplier);
+    }
+
+    @Test
+    void shouldIsolateRetryCountPerKey() {
+        // given
+        var key1 = "key1";
+        var key2 = "key2";
+        var counter1 = new AtomicInteger(0);
+        var counter2 = new AtomicInteger(0);
+
+        Supplier<PaymentResult> supplier1 = () -> {
+            var count = counter1.incrementAndGet();
+            return count >= 2
+                    ? new PaymentResult(true, "transaction-success-1")
+                    : new PaymentResult(false, "transaction-failed-1");
+        };
+
+        Supplier<PaymentResult> supplier2 = () -> {
+            counter2.incrementAndGet();
+            return new PaymentResult(false, "transaction-failed-2");
+        };
+
+        // when
+        PaymentResult result1 = null;
+        PaymentResult result2 = null;
+        for(int i = 0; i<6; i++) {
+            result1 = service.execute(key1, supplier1);
+            result2 = service.execute(key2, supplier2);
+        }
+
+        // then
+        assertThat(result1)
+                .isNotNull()
+                .returns(true, PaymentResult::success)
+                .returns("transaction-success-1", PaymentResult::transactionId);
+        assertThat(result2)
+                .isNotNull()
+                .returns(false, PaymentResult::success)
+                .returns("transaction-failed-2", PaymentResult::transactionId);
+
+        assertAll(
+                () -> assertThat(counter1.get()).isEqualTo(2),
+                () -> assertThat(counter2.get()).isEqualTo(5));
+    }
+
+    @Test
+    void shouldPropagateExceptionAndUpdateCache() {
+        // given
+        var key = "exception-key";
+        var counter = new AtomicInteger(0);
+        Supplier<PaymentResult> failingSupplier = () -> {
+            counter.incrementAndGet();
+            throw new RuntimeException("Failed");
+        };
+
+        // when && then
+        for(int i = 0; i<5; i++) {
+            assertThatThrownBy(() -> service.execute(key, failingSupplier))
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessage("Failed");
+        }
+
+        assertAll(
+                () -> assertThat(counter.get()).isEqualTo(5),
+                () -> assertThat(service.execute(key, failingSupplier))
+                        .returns(false, PaymentResult::success)
+                        .returns(null, PaymentResult::transactionId));
+    }
+
+    @Test
+    void shouldNotBlockDifferentKeysInConcurrentRequests() throws InterruptedException {
+        // given
+        var counter = new AtomicInteger(0);
+        var duration = 0L;
+        try (var executor = Executors.newFixedThreadPool(10)) {
+            Supplier<PaymentResult> slowSupplier = () -> {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                counter.incrementAndGet();
+                return new PaymentResult(false, "transaction-" + counter.get());
+            };
+
+            // when
+            var tasks = IntStream.range(0, 10)
+                    .<Callable<PaymentResult>>mapToObj(index ->
+                            () -> service.execute("key" + index, slowSupplier))
+                    .toList();
+
+            var startTime = System.currentTimeMillis();
+            executor.invokeAll(tasks);
+            duration = System.currentTimeMillis() - startTime;
+        }
+
+        // then
+        assertThat(counter.get()).isEqualTo(10);
+        assertThat(duration).isLessThan(400L);
+    }
+
+    @Test
+    void shouldReturnNullPointerExceptionWhenSupplierReturnsNull() {
+        // given
+        var key = "null-supplier-key";
+        Supplier<PaymentResult> nullSupplier = () -> null;
+
+        // when && then
+        assertThatThrownBy(() -> service.execute(key, nullSupplier))
+                .isInstanceOf(NullPointerException.class)
+                .hasMessage("Supplier must return a non-null PaymentResult");
     }
 }
