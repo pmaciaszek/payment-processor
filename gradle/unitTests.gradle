@@ -1,0 +1,35 @@
+apply plugin: 'idea'
+
+sourceSets {
+    unitTests {
+        java.srcDir "$projectDir/tests/unitTests/java"
+
+        compileClasspath += main.output + test.output
+        runtimeClasspath += main.output + test.output
+    }
+}
+
+idea {
+    module {
+        testSources.from(sourceSets.unitTests.java.srcDirs)
+    }
+}
+
+configurations {
+    unitTestsImplementation.extendsFrom testImplementaion
+    unitTestsCompileOnly.extendsFrom testComplieOnly
+    unitTestsRuntimeOnly.extendsFrom testRuntimeOnly
+    unitTestsAnnotationProcessor.extendsFrom testAnnotationProcessor
+}
+
+tasks.register('unitTests', Test) {
+    description = 'Runs Unit Tests'
+    group = 'verification'
+
+    testClassesDirs = sourceSets.unitTests.output.classesDirs
+    classpath = sourceSets.unitTests.runtimeClasspath
+
+    useJUnitPlatform()
+}
+
+test.dependsOn unitTests

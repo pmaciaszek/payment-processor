@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: demo
+  liquibase:
+    default-schema: app
+  jpa:
+    hibernate:
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategySnakeCaseImpl
+
+application:
+  config:
+    rest:
+      evictIdleConnectionTimeout: PT5M
+      maxConnectionsPerRoute: 20
+      maxConnectionsTotal: 40
+      connectionTimeout: PT60S
+      connectionRequestTimeout: PT30S
+      socketTimeout: PT60S
+      clients:
+        dummyDomain:
+          host: http://localhost:1010
+          endpoints:
+            testEndpoint: "/echo/{name}"

@@ -1,0 +1,37 @@
+apply plugin: 'idea'
+
+sourceSets {
+    integrationTests {
+        java.srcDir "$projectDir/tests/integrationTests/java"
+        resources.srcDir "$projectDir/tests/integrationTests/resources"
+
+        compileClasspath += main.output + test.output
+        runtimeClasspath += main.output + test.output
+    }
+}
+
+idea {
+    module {
+        testSources.from(sourceSets.integrationTests.java.srcDirs)
+    }
+}
+
+configurations {
+    integrationTestsImplementation.extendsFrom testImplementation
+    integrationTestsCompileOnly.extendsFrom testCompileOnly
+    integrationTestsRuntimeOnly.extendsFrom testRuntimeOnly
+    integrationTestsAnnotationProcessor.extendsFrom testAnnotationProcessor
+}
+
+tasks.register('integrationTests', Test) {
+    description = 'Runs Integration Tests'
+    group = 'verification'
+
+    testClassesDirs = sourceSets.integrationTests.output.classesDirs
+    classpath = sourceSets.integrationTests.runtimeClasspath
+
+    useJUnitPlatform()
+    shouldRunAfter unitTests
+}
+
+test.dependsOn integrationTests

@@ -1,0 +1,76 @@
+plugins {
+	id 'java'
+    id 'idea'
+	id 'org.springframework.boot' version '4.0.5'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+apply from: "$rootDir/gradle/unitTests.gradle"
+apply from: "$rootDir/gradle/integrationTests.gradle"
+
+group = 'com.zilch.interview'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+configurations {
+    compileOnly.extendsFrom annotationProcessor
+    testCompileOnly.extendsFrom testAnnotationProcessor
+}
+
+repositories {
+	mavenCentral()
+}
+
+ext {
+    liquibaseSessionLockVersion = "1.6.9"
+    liquibaseVersion = "5.0.2"
+    postgresVersion = "42.7.9"
+    preliquibaseVersion = "2.0.0"
+    testcontainersVersion = "1.21.4"
+    wiremockVersion = "4.2.1"
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.testcontainers:testcontainers-bom:$testcontainersVersion"
+    }
+}
+
+dependencies {
+    annotationProcessor 'org.projectlombok:lombok'
+
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-liquibase'
+    implementation 'org.apache.httpcomponents.client5:httpclient5'
+    implementation "com.github.blagerweij:liquibase-sessionlock:$liquibaseSessionLockVersion"
+    implementation "net.lbruun.springboot:preliquibase-spring-boot-starter:$preliquibaseVersion"
+    implementation "org.liquibase:liquibase-core:$liquibaseVersion"
+    implementation "org.postgresql:postgresql:$postgresVersion"
+
+
+    testAnnotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+    testImplementation 'org.springframework.boot:spring-boot-restclient'
+	testImplementation 'org.springframework.boot:spring-boot-resttestclient'
+    testImplementation "org.wiremock.integrations:wiremock-spring-boot:$wiremockVersion"
+	testImplementation 'org.testcontainers:testcontainers-junit-jupiter'
+	testImplementation 'org.testcontainers:postgresql'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+}
+
+test {
+    test.doFirst {
+        systemProperty 'java.library.path', 'build/native-libs'
+    }
+
+    useJUnitPlatform()
+}
