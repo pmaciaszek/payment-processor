@@ -1,6 +1,6 @@
 spring:
   application:
-    name: demo
+    name: payment-processor
   liquibase:
     default-schema: app
   jpa:
@@ -23,3 +23,6 @@ application:
           host: http://localhost:1010
           endpoints:
             testEndpoint: "/echo/{name}"
+    service:
+      operationLock:
+        maxRetries: 5

@@ -1,8 +1,8 @@
 package com.zilch.interview.controller;
 
 import com.zilch.interview.utils.base.IntegrationTest;
-import org.springframework.http.ResponseEntity;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.ResponseEntity;
 
 import java.net.URI;
 

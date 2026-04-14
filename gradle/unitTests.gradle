@@ -16,8 +16,8 @@ idea {
 }
 
 configurations {
-    unitTestsImplementation.extendsFrom testImplementaion
-    unitTestsCompileOnly.extendsFrom testComplieOnly
+    unitTestsImplementation.extendsFrom testImplementation
+    unitTestsCompileOnly.extendsFrom testCompileOnly
     unitTestsRuntimeOnly.extendsFrom testRuntimeOnly
     unitTestsAnnotationProcessor.extendsFrom testAnnotationProcessor
 }

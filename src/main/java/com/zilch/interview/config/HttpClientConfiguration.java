@@ -13,8 +13,6 @@ import org.apache.hc.core5.util.Timeout;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.sql.Time;
-
 @Configuration
 @RequiredArgsConstructor
 public class HttpClientConfiguration {
