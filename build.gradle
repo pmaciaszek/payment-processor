@@ -28,6 +28,7 @@ repositories {
 
 ext {
     caffeineVersion = "3.2.3"
+    guavaVersion = "33.5.0-jre"
     liquibaseSessionLockVersion = "1.6.9"
     liquibaseVersion = "5.0.2"
     postgresVersion = "42.7.9"
@@ -56,6 +57,7 @@ dependencies {
     implementation "net.lbruun.springboot:preliquibase-spring-boot-starter:$preliquibaseVersion"
     implementation "org.liquibase:liquibase-core:$liquibaseVersion"
     implementation "org.postgresql:postgresql:$postgresVersion"
+    implementation "com.google.guava:guava:$guavaVersion"
 
 
     testAnnotationProcessor 'org.projectlombok:lombok'

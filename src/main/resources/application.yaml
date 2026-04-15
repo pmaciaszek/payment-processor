@@ -18,23 +18,24 @@ spring:
 application:
   config:
     rest:
-      evictIdleConnectionTimeout: PT5M
-      maxConnectionsPerRoute: 20
-      maxConnectionsTotal: 40
-      connectionTimeout: PT60S
-      connectionRequestTimeout: PT30S
-      socketTimeout: PT60S
+      evict-idle-connection-timeout: PT5M
+      max-connections-per-route: 20
+      max-connections-total: 40
+      connection-timeout: PT60S
+      connection-request-timeout: PT30S
+      socket-timeout: PT60S
       clients:
         dummyDomain:
           host: http://localhost:1010
           endpoints:
             testEndpoint: "/echo/{name}"
     service:
-      operationLock:
-        maxRetries: 5
+      operation-lock:
         cache:
-          maxSize: 10_000
           ttl: PT6H
+          striped-lock-size: 512
+          max-size: 10_000
+        max-retries: 5
 
 management:
   endpoints:

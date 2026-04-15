@@ -6,5 +6,7 @@ import org.springframework.validation.annotation.Validated;
 import java.time.Duration;
 
 @Validated
-public record OperationLockServiceCacheProperties(@NonNull Integer maxSize, @NonNull Duration ttl) {
+public record OperationLockServiceCacheProperties(@NonNull Integer stripedLockSize,
+                                                  @NonNull Integer maxSize,
+                                                  @NonNull Duration ttl) {
 }

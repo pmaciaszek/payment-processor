@@ -42,6 +42,7 @@ class OperationLockServiceUnitTest {
                         new OperationLockServiceProperties(
                                 5,
                                 new OperationLockServiceCacheProperties(
+                                        32,
                                         100,
                                         Duration.of(5, ChronoUnit.MINUTES)))));
     }

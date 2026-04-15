@@ -6,3 +6,10 @@ spring:
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
     hikari:
         maximum-pool-size: 2
+
+application:
+  config:
+    service:
+      operation-lock:
+        cache:
+          striped-lock-size: 32

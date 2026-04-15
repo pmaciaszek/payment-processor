@@ -25,7 +25,7 @@ public class CurrencyAmountValidator implements ConstraintValidator<ValidCurrenc
 
         var allowedFractionDigits = currency.getDefaultFractionDigits();
 
-        if (requestDTO.amount().stripTrailingZeros().scale() >allowedFractionDigits) {
+        if (requestDTO.amount().stripTrailingZeros().scale() > allowedFractionDigits) {
             addCustomValidationMessage(context, INVALID_AMOUNT_SCALE_MESSAGE.formatted(
                     requestDTO.currency(), allowedFractionDigits));
             return false;
