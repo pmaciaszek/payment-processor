@@ -3,7 +3,9 @@ package com.zilch.interview.service;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.zilch.interview.config.properties.ServicesProperties;
+import com.zilch.interview.exception.IdempotencyKeyDuplicationException;
 import com.zilch.interview.model.CacheEntry;
+import com.zilch.interview.model.IdempotencyKey;
 import com.zilch.interview.model.PaymentResult;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
@@ -29,19 +31,26 @@ public class OperationLockService {
         this.maxRetries = servicesProperties.operationLock().maxRetries();
     }
 
-    public PaymentResult execute(@NonNull String idempotencyKey, @NonNull Supplier<PaymentResult> supplier) {
+    public PaymentResult execute(@NonNull IdempotencyKey idempotencyKey, @NonNull Supplier<PaymentResult> supplier) {
         return getCachedResult(idempotencyKey)
                 .filter(entry -> entry.paymentResult().success() || entry.retryCount() >= maxRetries)
                 .map(CacheEntry::paymentResult)
                 .orElseGet(() -> processNewAction(idempotencyKey, supplier));
     }
 
-    private Optional<CacheEntry> getCachedResult(String idempotencyKey) {
-        return Optional.ofNullable(cache.getIfPresent(idempotencyKey));
+    private Optional<CacheEntry> getCachedResult(IdempotencyKey idempotencyKey) {
+        var cachedResult = cache.getIfPresent(idempotencyKey.key());
+        if (cachedResult == null) {
+            return Optional.empty();
+        }
+        if (!cachedResult.requestBodyHash().equals(idempotencyKey.requestBodyHash())) {
+            throw IdempotencyKeyDuplicationException.ofDuplicateKey(idempotencyKey.key());
+        }
+        return Optional.of(cachedResult);
     }
 
-    private PaymentResult processNewAction(String idempotencyKey, Supplier<PaymentResult> supplier) {
-        var lock = getLock(idempotencyKey);
+    private PaymentResult processNewAction(IdempotencyKey idempotencyKey, Supplier<PaymentResult> supplier) {
+        var lock = getLock(idempotencyKey.key());
         lock.lock();
         try {
             return getCachedResult(idempotencyKey)
@@ -53,21 +62,29 @@ public class OperationLockService {
         }
     }
 
-    private PaymentResult performSupplierAction(String idempotencyKey, Supplier<PaymentResult> supplier) {
-       var newRetryCount = getNextRetry(idempotencyKey);
+    private PaymentResult performSupplierAction(IdempotencyKey idempotencyKey, Supplier<PaymentResult> supplier) {
+       var newRetryCount = getNextRetryCounterValue(idempotencyKey.key());
         try {
             var result = supplier.get();
-            cache.put(idempotencyKey, new CacheEntry(
-                    Objects.requireNonNull(result, "Supplier must return a non-null PaymentResult"),
-                    newRetryCount));
+            cache.put(idempotencyKey.key(),
+                    CacheEntry.builder()
+                            .paymentResult(Objects.requireNonNull(result, "Supplier must return a non-null PaymentResult"))
+                            .retryCount(newRetryCount)
+                            .requestBodyHash(idempotencyKey.requestBodyHash())
+                            .build());
             return result;
         } catch (Exception exception) {
-            cache.put(idempotencyKey, new CacheEntry(new PaymentResult(false, null), newRetryCount));
+            cache.put(idempotencyKey.key(),
+                    CacheEntry.builder()
+                            .paymentResult(new PaymentResult(false, null))
+                            .retryCount(newRetryCount)
+                            .requestBodyHash(idempotencyKey.requestBodyHash())
+                            .build());
             throw exception;
         }
     }
 
-    private int getNextRetry(String idempotencyKey) {
+    private int getNextRetryCounterValue(String idempotencyKey) {
         var currentEntry = cache.getIfPresent(idempotencyKey);
         return currentEntry != null ? currentEntry.retryCount() + 1 : 1;
     }

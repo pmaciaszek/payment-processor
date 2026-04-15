@@ -3,6 +3,7 @@ package com.zilch.interview.service;
 import com.zilch.interview.config.properties.OperationLockServiceCacheProperties;
 import com.zilch.interview.config.properties.OperationLockServiceProperties;
 import com.zilch.interview.config.properties.ServicesProperties;
+import com.zilch.interview.model.IdempotencyKey;
 import com.zilch.interview.model.PaymentResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,7 +49,7 @@ class OperationLockServiceUnitTest {
     @Test
     void shouldReturnSuccessResultAfterInitialFailedAttempt() {
         //given
-        var key = "retry-key";
+        var key = new IdempotencyKey("retry-key", "hash1");
         var failedTransactionId = "transaction-failed";
         var successfulTransactionId = "transaction-succeeded";
         when(supplier.get()).thenReturn(
@@ -75,7 +76,7 @@ class OperationLockServiceUnitTest {
     @Test
     void shouldRetryUpTo5TimesOnFailedPaymentResult() {
         // given
-        var idempotencyKey = "retry-key";
+        var idempotencyKey = new IdempotencyKey("retry-key", "hash1");
         var failedTransactionId = "transaction-failed";
         when(supplier.get()).thenReturn(new PaymentResult(false, failedTransactionId));
 
@@ -96,7 +97,7 @@ class OperationLockServiceUnitTest {
     @Test
     void shouldReturnCachedSuccessResult() {
         //given
-        var key = "success-key";
+        var key = new IdempotencyKey("success-key", "hash1");
         var transactionId = "transaction-1";
         when(supplier.get()).thenReturn(new PaymentResult(true, transactionId));
 
@@ -120,7 +121,7 @@ class OperationLockServiceUnitTest {
     @Test
     void shouldHandleConcurrentRequestsWithRetryLimit() throws InterruptedException {
         // given
-        var key = "concurrent-key";
+        var key = new IdempotencyKey("concurrent-key", "hash1");
         var counter = new AtomicInteger(0);
         try (var executor = Executors.newFixedThreadPool(10)) {
             Supplier<PaymentResult> realSupplier = () -> {
@@ -148,8 +149,8 @@ class OperationLockServiceUnitTest {
     @Test
     void shouldIsolateCachePerKey() {
         // given
-        var key1 = "key1";
-        var key2 = "key2";
+        var key1 = new IdempotencyKey("key1", "hash1");
+        var key2 = new IdempotencyKey("key2", "hash2");
         var transactionId1 = "transaction-1";
         var transactionId2Failed = "transaction-2-failed";
         var transactionId2Success = "transaction-2-succeed";
@@ -184,8 +185,8 @@ class OperationLockServiceUnitTest {
     @Test
     void shouldIsolateRetryCountPerKey() {
         // given
-        var key1 = "key1";
-        var key2 = "key2";
+        var key1 = new IdempotencyKey("key1", "hash1");
+        var key2 = new IdempotencyKey("key2", "hash2");
         var counter1 = new AtomicInteger(0);
         var counter2 = new AtomicInteger(0);
 
@@ -227,7 +228,7 @@ class OperationLockServiceUnitTest {
     @Test
     void shouldPropagateExceptionAndUpdateCache() {
         // given
-        var key = "exception-key";
+        var key = new IdempotencyKey("exception-key", "hash1");
         var counter = new AtomicInteger(0);
         Supplier<PaymentResult> failingSupplier = () -> {
             counter.incrementAndGet();
@@ -267,7 +268,7 @@ class OperationLockServiceUnitTest {
             // when
             var tasks = IntStream.range(0, 10)
                     .<Callable<PaymentResult>>mapToObj(index ->
-                            () -> service.execute("key" + index, slowSupplier))
+                            () -> service.execute(new IdempotencyKey("key" + index, "hash" + index), slowSupplier))
                     .toList();
 
             var startTime = System.currentTimeMillis();
@@ -283,12 +284,32 @@ class OperationLockServiceUnitTest {
     @Test
     void shouldReturnNullPointerExceptionWhenSupplierReturnsNull() {
         // given
-        var key = "null-supplier-key";
+        var key = new IdempotencyKey("null-supplier-key", "hash1");
         Supplier<PaymentResult> nullSupplier = () -> null;
 
         // when && then
         assertThatThrownBy(() -> service.execute(key, nullSupplier))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("Supplier must return a non-null PaymentResult");
+    }
+
+    @Test
+    void shouldThrowIdempotencyKeyDuplicationExceptionWhenSameKeyWithDifferentHash() {
+        // given
+        var key = "same-key";
+        var hash1 = "hash1";
+        var hash2 = "hash2";
+        var idempotencyKey1 = new IdempotencyKey(key, hash1);
+        var idempotencyKey2 = new IdempotencyKey(key, hash2);
+
+        when(supplier.get()).thenReturn(new PaymentResult(true, "tx1"));
+
+        // when
+        service.execute(idempotencyKey1, supplier);
+
+        // then
+        assertThatThrownBy(() -> service.execute(idempotencyKey2, supplier))
+                .isInstanceOf(com.zilch.interview.exception.IdempotencyKeyDuplicationException.class)
+                .hasMessageContaining("Idempotency key: same-key was used with different request");
     }
 }

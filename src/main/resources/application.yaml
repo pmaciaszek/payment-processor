@@ -1,13 +1,19 @@
+server:
+  servlet:
+    context-path: /payment-processor
+
 spring:
   application:
     name: payment-processor
-  liquibase:
-    default-schema: app
   jpa:
     hibernate:
       ddl-auto: none
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategySnakeCaseImpl
+  liquibase:
+    default-schema: payment_processor
+  main:
+    banner-mode: off
 
 application:
   config:
@@ -29,3 +35,9 @@ application:
         cache:
           maxSize: 10_000
           ttl: PT6H
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: metrics

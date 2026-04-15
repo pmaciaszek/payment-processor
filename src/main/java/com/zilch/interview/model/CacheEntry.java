@@ -1,4 +1,7 @@
 package com.zilch.interview.model;
 
-public record CacheEntry(PaymentResult paymentResult, int retryCount) {
+import lombok.Builder;
+
+@Builder
+public record CacheEntry(PaymentResult paymentResult, int retryCount, String requestBodyHash) {
 }
