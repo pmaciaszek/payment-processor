@@ -1,0 +1,115 @@
+{
+  "mappings": [
+    {
+      "id": "89d6e6ed-e387-4988-9b69-a61fc6a4831f",
+      "request": {
+        "method": "POST",
+        "url": "/v1/card/validation",
+        "bodyPatterns": [
+          {
+            "matchesJsonPath": "$[?(@.cardToken =~ /tok_error500.*/)]"
+          }
+        ]
+      },
+      "response": {
+        "status": 500,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "jsonBody": {
+          "code": "CRD-500",
+          "message": "Internal error"
+        }
+      }
+    },
+    {
+      "id": "c5c9e681-3659-45da-a3e3-3d4f3c3a6956",
+      "request": {
+        "method": "POST",
+        "url": "/v1/card/validation",
+        "bodyPatterns": [
+          {
+            "matchesJsonPath": "$[?(@.cardToken =~ /tok_error503.*/)]"
+          }
+        ]
+      },
+      "response": {
+        "status": 503,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "jsonBody": {
+          "code": "CRD-503",
+          "message": "Card service unavailable"
+        }
+      }
+    },
+    {
+      "id": "1ec3a253-4dd9-4713-833e-b64754984b4f",
+      "request": {
+        "method": "POST",
+        "url": "/v1/card/validation",
+        "bodyPatterns": [
+          {
+            "matchesJsonPath": "$[?(@.cardToken =~ /tok_notfound.*/)]"
+          }
+        ]
+      },
+      "response": {
+        "status": 404,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "jsonBody": {
+          "code": "CRD-404",
+          "message": "Card not found"
+        }
+      }
+    },
+    {
+      "id": "ae0fd809-ccb6-4a3c-a95f-039b785c298b",
+      "request": {
+        "method": "POST",
+        "url": "/v1/card/validation",
+        "bodyPatterns": [
+          {
+            "matchesJsonPath": "$[?(@.cardToken =~ /tok_slow.*/)]"
+          }
+        ]
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "jsonBody": {
+          "status": "ACTIVE",
+          "limits": {
+            "maxAmount": 1000.00,
+            "currency": "GBP"
+          }
+        },
+        "fixedDelayMilliseconds": 6000
+      }
+    },
+    {
+      "id": "7dd8e0fb-f427-4f12-aeb7-a6d32cbcfb2d",
+      "request": {
+        "method": "POST",
+        "url": "/v1/card/validation",
+        "bodyPatterns": [
+          {
+            "matchesJsonPath": "$[?(@.cardToken =~ /tok_badjson.*/)]"
+          }
+        ]
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": "{invalid}"
+      }
+    }
+  ]
+}

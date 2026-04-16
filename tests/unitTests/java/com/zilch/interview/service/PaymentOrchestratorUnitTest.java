@@ -1,5 +1,12 @@
 package com.zilch.interview.service;
 
+import static com.zilch.interview.utils.PaymentRequestDTOProvider.getPaymentDTORequestBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.zilch.interview.model.IdempotencyKey;
 import com.zilch.interview.model.PaymentResult;
 import org.junit.jupiter.api.Test;
@@ -10,13 +17,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.function.Supplier;
-
-import static com.zilch.interview.utils.PaymentRequestDTOProvider.getPaymentDTORequestBuilder;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class PaymentOrchestratorUnitTest {

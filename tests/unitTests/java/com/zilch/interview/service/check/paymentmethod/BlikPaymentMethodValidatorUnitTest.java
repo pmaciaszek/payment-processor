@@ -1,5 +1,9 @@
 package com.zilch.interview.service.check.paymentmethod;
 
+import static com.zilch.interview.utils.PaymentRequestDTOProvider.getPaymentDTORequestBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 import com.zilch.interview.dto.BlikPaymentMethodDTO;
 import com.zilch.interview.enums.PaymentMethodType;
 import org.junit.jupiter.api.Test;
@@ -7,10 +11,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
-
-import static com.zilch.interview.utils.PaymentRequestDTOProvider.getPaymentDTORequestBuilder;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 class BlikPaymentMethodValidatorUnitTest {
 

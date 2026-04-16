@@ -1,5 +1,9 @@
 package com.zilch.interview.service.check;
 
+import static com.zilch.interview.utils.PaymentRequestDTOProvider.getPaymentDTORequestBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+
 import com.zilch.interview.entity.UserDeviceEntity;
 import com.zilch.interview.entity.UserDeviceId;
 import com.zilch.interview.enums.CheckStage;
@@ -13,10 +17,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 import java.util.UUID;
-
-import static com.zilch.interview.utils.PaymentRequestDTOProvider.getPaymentDTORequestBuilder;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DeviceCheckUnitTest {

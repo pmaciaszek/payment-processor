@@ -11,6 +11,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -56,9 +58,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     private String extractErrors(MethodArgumentNotValidException exception) {
-        return exception.getBindingResult().getFieldErrors().stream()
-                .map(error -> "Field '%s' %s".formatted(error.getField(), error.getDefaultMessage()))
+        return exception.getBindingResult().getAllErrors().stream()
+                .map(this::getObjectErrorMessage)
                 .collect(Collectors.joining(", "));
+    }
+
+    private String getObjectErrorMessage(ObjectError objectError) {
+        if (objectError instanceof FieldError fieldError) {
+            return "Field '%s' %s".formatted(fieldError.getField(), fieldError.getDefaultMessage());
+        }
+        return objectError.getDefaultMessage();
     }
 
     @ExceptionHandler(IdempotencyKeyDuplicationException.class)

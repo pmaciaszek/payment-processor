@@ -1,5 +1,12 @@
 package com.zilch.interview.service.check;
 
+import static com.zilch.interview.utils.PaymentRequestDTOProvider.getPaymentDTORequestBuilder;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.zilch.interview.enums.CheckStage;
 import com.zilch.interview.exception.ValidationCheckException;
 import com.zilch.interview.model.CheckResult;
@@ -16,14 +23,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
-import static com.zilch.interview.utils.PaymentRequestDTOProvider.getPaymentDTORequestBuilder;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class PaymentRequestValidatorServiceUnitTest {

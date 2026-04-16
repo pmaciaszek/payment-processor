@@ -15,7 +15,7 @@ public class BalanceCheck implements PaymentRequestCheck {
 
     @Override
     public CheckResult check(PaymentRequestDTO requestDTO) {
-        var currentBalance = balanceClient.getUserBalance(requestDTO.userId()).runningBalance();
+        var currentBalance = balanceClient.getUserBalance(requestDTO.userId(), requestDTO.currency()).runningBalance();
         if (currentBalance == null) {
             return CheckResult.fail("Unable to get current balance");
         }

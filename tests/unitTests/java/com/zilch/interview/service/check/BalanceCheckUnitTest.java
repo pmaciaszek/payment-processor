@@ -1,5 +1,9 @@
 package com.zilch.interview.service.check;
 
+import static com.zilch.interview.utils.PaymentRequestDTOProvider.getPaymentDTORequestBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+
 import com.zilch.interview.client.BalanceClient;
 import com.zilch.interview.dto.balance.UserBalanceResponseDTO;
 import com.zilch.interview.enums.CheckStage;
@@ -11,10 +15,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-
-import static com.zilch.interview.utils.PaymentRequestDTOProvider.getPaymentDTORequestBuilder;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class BalanceCheckUnitTest {
@@ -31,7 +31,7 @@ class BalanceCheckUnitTest {
         var requestDTO = getPaymentDTORequestBuilder()
                 .amount(BigDecimal.valueOf(100))
                 .build();
-        when(balanceClient.getUserBalance(requestDTO.userId()))
+        when(balanceClient.getUserBalance(requestDTO.userId(), "GBP"))
                 .thenReturn(new UserBalanceResponseDTO(BigDecimal.valueOf(150)));
 
         // when
@@ -47,7 +47,7 @@ class BalanceCheckUnitTest {
         var requestDTO = getPaymentDTORequestBuilder()
                 .amount(BigDecimal.valueOf(100))
                 .build();
-        when(balanceClient.getUserBalance(requestDTO.userId()))
+        when(balanceClient.getUserBalance(requestDTO.userId(), "GBP"))
                 .thenReturn(new UserBalanceResponseDTO(BigDecimal.valueOf(100)));
 
         // when
@@ -63,7 +63,7 @@ class BalanceCheckUnitTest {
         var requestDTO = getPaymentDTORequestBuilder()
                 .amount(BigDecimal.valueOf(100.01))
                 .build();
-        when(balanceClient.getUserBalance(requestDTO.userId()))
+        when(balanceClient.getUserBalance(requestDTO.userId(), "GBP"))
                 .thenReturn(new UserBalanceResponseDTO(BigDecimal.valueOf(100)));
 
         // when
@@ -79,7 +79,7 @@ class BalanceCheckUnitTest {
     void shouldReturnFailWhenBalanceIsNull() {
         // given
         var requestDTO = getPaymentDTORequestBuilder().build();
-        when(balanceClient.getUserBalance(requestDTO.userId()))
+        when(balanceClient.getUserBalance(requestDTO.userId(), "GBP"))
                 .thenReturn(new UserBalanceResponseDTO(null));
 
         // when

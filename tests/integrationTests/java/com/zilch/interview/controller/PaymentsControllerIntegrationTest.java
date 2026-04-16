@@ -1,5 +1,8 @@
 package com.zilch.interview.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 import com.zilch.interview.dto.CardPaymentMethodDTO;
 import com.zilch.interview.dto.PaymentRequestDTO;
 import com.zilch.interview.dto.PaymentResponseDTO;
@@ -17,9 +20,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.math.BigDecimal;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 class PaymentsControllerIntegrationTest extends IntegrationTest {
 
@@ -86,7 +86,7 @@ class PaymentsControllerIntegrationTest extends IntegrationTest {
                 .deviceId(DEVICE_ID)
                 .merchantId("merchant-123")
                 .orderId("order-456")
-                .amount(new BigDecimal("150.00"))
+                .amount(new BigDecimal("202.00"))
                 .currency("GBP")
                 .paymentMethod(new CardPaymentMethodDTO(PaymentMethodType.CARD, "tok_1234567890"))
                 .build();

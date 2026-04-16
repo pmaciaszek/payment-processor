@@ -50,6 +50,150 @@
           }
         }
       }
+    },
+    {
+      "id": "d8eab656-0140-4079-9b1f-1df2e03a85d9",
+      "request": {
+        "method": "POST",
+        "url": "/v1/card/validation",
+        "bodyPatterns": [
+          {
+            "matchesJsonPath": "$[?(@.cardToken =~ /tok_suspended.*/)]"
+          }
+        ]
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "jsonBody": {
+          "status": "SUSPENDED",
+          "limits": {
+            "maxAmount": 1000.00,
+            "currency": "GBP"
+          }
+        }
+      }
+    },
+    {
+      "id": "42be7120-5151-4b91-bf7d-26b6a65478ac",
+      "request": {
+        "method": "POST",
+        "url": "/v1/card/validation",
+        "bodyPatterns": [
+          {
+            "matchesJsonPath": "$[?(@.cardToken =~ /tok_inactive.*/)]"
+          }
+        ]
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "jsonBody": {
+          "status": "INACTIVE",
+          "limits": {
+            "maxAmount": 1000.00,
+            "currency": "GBP"
+          }
+        }
+      }
+    },
+    {
+      "id": "85fdd843-f294-42b2-8e60-32d1a71caa30",
+      "request": {
+        "method": "POST",
+        "url": "/v1/card/validation",
+        "bodyPatterns": [
+          {
+            "matchesJsonPath": "$[?(@.cardToken =~ /tok_lowlimit.*|tok_exactlimit.*/)]"
+          }
+        ]
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "jsonBody": {
+          "status": "ACTIVE",
+          "limits": {
+            "maxAmount": 100.00,
+            "currency": "GBP"
+          }
+        }
+      }
+    },
+    {
+      "id": "9c9a0de2-1420-4615-9cd4-e23937f43aaa",
+      "request": {
+        "method": "POST",
+        "url": "/v1/card/validation",
+        "bodyPatterns": [
+          {
+            "matchesJsonPath": "$[?(@.cardToken =~ /tok_nolimits.*/)]"
+          }
+        ]
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "jsonBody": {
+          "status": "ACTIVE",
+          "limits": {
+            "maxAmount": null,
+            "currency": "GBP"
+          }
+        }
+      }
+    },
+    {
+      "id": "33a9a1ea-9c42-4e8e-9aa9-6d29223201c9",
+      "request": {
+        "method": "POST",
+        "url": "/v1/card/validation",
+        "bodyPatterns": [
+          {
+            "matchesJsonPath": "$[?(@.cardToken =~ /tok_eurocard.*/)]"
+          }
+        ]
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "jsonBody": {
+          "status": "ACTIVE",
+          "limits": {
+            "maxAmount": 500.00,
+            "currency": "EUR"
+          }
+        }
+      }
+    },
+    {
+      "id": "b9a420a0-7248-4ba7-9c56-137f9fb15442",
+      "request": {
+        "method": "POST",
+        "url": "/v1/card/validation",
+        "bodyPatterns": [
+          {
+            "matchesJsonPath": "$[?(@.cardToken =~ /tok_nullresp.*/)]"
+          }
+        ]
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": "null"
+      }
     }
   ]
 }

@@ -1,5 +1,8 @@
 package com.zilch.interview.dto;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import com.zilch.interview.enums.PaymentMethodType;
 import com.zilch.interview.utils.ConstraintValidationProvider;
 import jakarta.validation.ConstraintViolation;
@@ -14,9 +17,6 @@ import java.math.BigDecimal;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PaymentRequestDTOUnitTest {
 

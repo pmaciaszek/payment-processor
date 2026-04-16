@@ -1,5 +1,8 @@
 package com.zilch.interview.controller;
 
+import static com.zilch.interview.utils.provider.PaymentRequestDTOProvider.getPaymentDTORequestBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.zilch.interview.dto.BlikPaymentMethodDTO;
 import com.zilch.interview.dto.PaymentResponseDTO;
 import com.zilch.interview.entity.UserDeviceEntity;
@@ -14,9 +17,6 @@ import com.zilch.interview.utils.base.IntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-import static com.zilch.interview.utils.provider.PaymentRequestDTOProvider.getPaymentDTORequestBuilder;
-import static org.assertj.core.api.Assertions.assertThat;
 
 class BlikPaymentIntegrationTest extends IntegrationTest {
 
@@ -62,7 +62,7 @@ class BlikPaymentIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    void shouldReturnBadRequestWhenBlikCodeIsReserved() {
+    void shouldReturnBadRequestWhenBlikCodeIsNotActive() {
         // given
         var user = userRepository.save(UserEntity.builder()
                 .status(UserAccountStatus.ACTIVE)

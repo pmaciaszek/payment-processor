@@ -1,5 +1,9 @@
 package com.zilch.interview.controller;
 
+import static com.zilch.interview.utils.provider.PaymentRequestDTOProvider.getPaymentDTORequestBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 import com.zilch.interview.dto.CardPaymentMethodDTO;
 import com.zilch.interview.dto.PaymentResponseDTO;
 import com.zilch.interview.entity.UserDeviceEntity;
@@ -16,10 +20,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.UUID;
-
-import static com.zilch.interview.utils.provider.PaymentRequestDTOProvider.getPaymentDTORequestBuilder;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 class IdempotencyIntegrationTest extends IntegrationTest {
 

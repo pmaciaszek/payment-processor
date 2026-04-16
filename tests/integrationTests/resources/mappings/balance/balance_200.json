@@ -1,0 +1,66 @@
+{
+  "mappings": [
+    {
+      "id": "8ff5cb0f-9d23-40c3-86f2-86526e1a46fb",
+      "priority": 10,
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/v1/balance/[a-f0-9-]{36}"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "jsonBody": {
+          "runningBalance": 200.00,
+          "currency": "GBP"
+        }
+      }
+    },
+    {
+      "id": "3e661c89-dc30-40e1-9bb6-fba305d65521",
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/v1/balance/[a-f0-9-]{36}",
+        "queryParameters": {
+          "currency": {
+            "equalTo": "EUR"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "jsonBody": {
+          "runningBalance": 250.00,
+          "currency": "EUR"
+        }
+      }
+    },
+    {
+      "id": "ef120bf1-1261-4d1b-9ced-781f2a3b0e69",
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/v1/balance/[a-f0-9-]{36}",
+        "queryParameters": {
+          "currency": {
+            "equalTo": "USD"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "jsonBody": {
+          "runningBalance": 500.00,
+          "currency": "USD"
+        }
+      }
+    }
+  ]
+}

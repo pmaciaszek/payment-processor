@@ -1,5 +1,8 @@
 package com.zilch.interview.controller;
 
+import static com.zilch.interview.utils.provider.PaymentRequestDTOProvider.getPaymentDTORequestBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.zilch.interview.entity.UserEntity;
 import com.zilch.interview.enums.UserAccountStatus;
 import com.zilch.interview.exception.PaymentProcessorErrorResponseDTO;
@@ -9,9 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.UUID;
-
-import static com.zilch.interview.utils.provider.PaymentRequestDTOProvider.getPaymentDTORequestBuilder;
-import static org.assertj.core.api.Assertions.assertThat;
 
 class UserCheckIntegrationTest extends IntegrationTest {
 

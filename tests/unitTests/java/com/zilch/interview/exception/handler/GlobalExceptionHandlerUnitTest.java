@@ -1,5 +1,10 @@
 package com.zilch.interview.exception.handler;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.zilch.interview.dto.balance.BalanceErrorResponseDTO;
 import com.zilch.interview.dto.card.CardErrorResponseDTO;
 import com.zilch.interview.exception.BalanceResponseException;
@@ -9,7 +14,6 @@ import com.zilch.interview.exception.PaymentProcessorErrorResponseDTO;
 import com.zilch.interview.exception.ValidationCheckException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.http.HttpHeaders;
@@ -22,11 +26,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import java.util.List;
 import java.util.concurrent.CompletionException;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(OutputCaptureExtension.class)
 class GlobalExceptionHandlerUnitTest {
 
@@ -35,7 +34,6 @@ class GlobalExceptionHandlerUnitTest {
     @Test
     void shouldHandleValidationCheckException(CapturedOutput output) {
         // given
-        var message = "Validation failed";
         var exception = ValidationCheckException.empty();
 
         // when
@@ -160,7 +158,7 @@ class GlobalExceptionHandlerUnitTest {
         var fieldError = new FieldError("object", "field", "is invalid");
 
         when(exception.getBindingResult()).thenReturn(bindingResult);
-        when(bindingResult.getFieldErrors()).thenReturn(List.of(fieldError));
+        when(bindingResult.getAllErrors()).thenReturn(List.of(fieldError));
 
         // when
         var response = handler.handleMethodArgumentNotValid(exception, new HttpHeaders(), HttpStatus.BAD_REQUEST, null);
