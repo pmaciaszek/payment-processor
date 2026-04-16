@@ -1,6 +1,7 @@
 package com.zilch.interview.service.check.paymentmethod;
 
 import com.zilch.interview.dto.BlikPaymentMethodDTO;
+import com.zilch.interview.dto.PaymentRequestDTO;
 import com.zilch.interview.enums.PaymentMethodType;
 import com.zilch.interview.model.CheckResult;
 import org.springframework.stereotype.Component;
@@ -14,9 +15,9 @@ public class BlikPaymentMethodValidator implements PaymentMethodValidator<BlikPa
     }
 
     @Override
-    public CheckResult validate(BlikPaymentMethodDTO paymentMethod) {
+    public CheckResult validate(PaymentRequestDTO paymentRequestDTO) {
         // mock validation
-
+        var paymentMethod = getPaymentMethod(paymentRequestDTO);
         if (paymentMethod.blikCode().isBlank() || paymentMethod.blikCode().equals("123456")) {
             return CheckResult.fail("BLIK code is not active");
         }

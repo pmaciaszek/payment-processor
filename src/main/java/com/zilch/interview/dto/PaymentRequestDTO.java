@@ -11,7 +11,7 @@ import lombok.NonNull;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-@Builder
+@Builder(toBuilder = true)
 @ValidCurrencyAmount
 public record PaymentRequestDTO(
         @NonNull UUID userId,

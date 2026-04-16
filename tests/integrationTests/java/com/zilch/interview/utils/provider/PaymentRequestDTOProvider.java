@@ -1,4 +1,4 @@
-package com.zilch.interview.utils;
+package com.zilch.interview.utils.provider;
 
 import com.zilch.interview.dto.CardPaymentMethodDTO;
 import com.zilch.interview.dto.PaymentRequestDTO;
@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+import static org.apache.commons.lang3.RandomStringUtils.secure;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class PaymentRequestDTOProvider {
 
@@ -17,9 +19,9 @@ public final class PaymentRequestDTOProvider {
                 .userId(UUID.randomUUID())
                 .amount(BigDecimal.TEN)
                 .currency("GBP")
-                .paymentMethod(new CardPaymentMethodDTO(PaymentMethodType.CARD, "tok_abcdefghij"))
-                .merchantId("merchant-1")
-                .orderId("order-1")
-                .deviceId("device-1");
+                .paymentMethod(new CardPaymentMethodDTO(PaymentMethodType.CARD, "tok_" + secure().nextAlphanumeric(10)))
+                .merchantId(secure().nextAlphanumeric(5))
+                .orderId(secure().nextAlphanumeric(6))
+                .deviceId(secure().nextAlphanumeric(8));
     }
 }

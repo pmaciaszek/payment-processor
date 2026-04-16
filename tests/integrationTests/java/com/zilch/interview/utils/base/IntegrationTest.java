@@ -1,5 +1,7 @@
 package com.zilch.interview.utils.base;
 
+import com.zilch.interview.repository.UserDeviceRepository;
+import com.zilch.interview.repository.UserRepository;
 import com.zilch.interview.utils.configs.RestTestClientConfiguration;
 import com.zilch.interview.utils.configs.WiremockConfiguration;
 import com.zilch.interview.utils.rest.RestTestClient;
@@ -37,4 +39,10 @@ public abstract class IntegrationTest {
 
     @Autowired
     protected RestTestClient restTestClient;
+
+    @Autowired
+    protected UserRepository userRepository;
+
+    @Autowired
+    protected UserDeviceRepository userDeviceRepository;
 }

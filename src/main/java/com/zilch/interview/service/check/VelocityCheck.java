@@ -12,10 +12,11 @@ import org.springframework.stereotype.Component;
 public class VelocityCheck implements PaymentRequestCheck {
 
     private final ServicesProperties servicesProperties;
+    private final GlobalRequestCounter globalRequestCounter;
 
     @Override
     public CheckResult check(PaymentRequestDTO requestDTO) {
-        int requests = GlobalRequestCounter.increment(requestDTO.userId());
+        int requests = globalRequestCounter.increment(requestDTO.userId());
 
         if (requests > servicesProperties.velocityCheck().maxRequestCount()) {
             return CheckResult.fail("Too many requests");

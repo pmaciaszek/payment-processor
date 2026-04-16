@@ -69,7 +69,7 @@ public class OperationLockService {
     }
 
     private PaymentResult performSupplierAction(IdempotencyKey idempotencyKey, Supplier<PaymentResult> supplier) {
-       var newRetryCount = getNextRetryCounterValue(idempotencyKey.key());
+        var newRetryCount = getNextRetryCounterValue(idempotencyKey.key());
         try {
             var result = supplier.get();
             cache.put(idempotencyKey.key(),

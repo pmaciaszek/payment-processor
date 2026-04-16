@@ -46,7 +46,7 @@ class OperationLockServiceUnitTest {
                                         32,
                                         100,
                                         Duration.of(5, ChronoUnit.MINUTES))),
-                        new VelocityCheckProperties(2)));
+                        new VelocityCheckProperties(2, 60L)));
     }
 
     @Test
@@ -84,7 +84,7 @@ class OperationLockServiceUnitTest {
         when(supplier.get()).thenReturn(new PaymentResult(false, failedTransactionId));
 
         // when
-        for( int i = 0; i<6; i++) {
+        for (int i = 0; i < 6; i++) {
             service.execute(idempotencyKey, supplier);
         }
         var lastResult = service.execute(idempotencyKey, supplier);
@@ -107,7 +107,7 @@ class OperationLockServiceUnitTest {
         // when
         var result1 = service.execute(key, supplier);
         var result2 = service.execute(key, supplier);
-        
+
         // then
         assertAll(
                 () -> assertThat(result1)
@@ -208,7 +208,7 @@ class OperationLockServiceUnitTest {
         // when
         PaymentResult result1 = null;
         PaymentResult result2 = null;
-        for(int i = 0; i<6; i++) {
+        for (int i = 0; i < 6; i++) {
             result1 = service.execute(key1, supplier1);
             result2 = service.execute(key2, supplier2);
         }
@@ -239,7 +239,7 @@ class OperationLockServiceUnitTest {
         };
 
         // when && then
-        for(int i = 0; i<5; i++) {
+        for (int i = 0; i < 5; i++) {
             assertThatThrownBy(() -> service.execute(key, failingSupplier))
                     .isInstanceOf(RuntimeException.class)
                     .hasMessage("Failed");

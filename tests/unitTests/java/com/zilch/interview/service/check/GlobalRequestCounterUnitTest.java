@@ -1,7 +1,12 @@
 package com.zilch.interview.service.check;
 
+import com.zilch.interview.config.properties.ServicesProperties;
+import com.zilch.interview.config.properties.VelocityCheckProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
@@ -9,12 +14,20 @@ import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class GlobalRequestCounterUnitTest {
+
+    @Mock
+    private ServicesProperties servicesProperties;
+
+    private GlobalRequestCounter globalRequestCounter;
 
     @BeforeEach
     void setUp() {
-        GlobalRequestCounter.reset();
+        when(servicesProperties.velocityCheck()).thenReturn(new VelocityCheckProperties(10, 60L));
+        globalRequestCounter = new GlobalRequestCounter(servicesProperties);
     }
 
     @Test
@@ -24,9 +37,9 @@ class GlobalRequestCounterUnitTest {
         var userId2 = UUID.randomUUID();
 
         // when
-        var count1_1 = GlobalRequestCounter.increment(userId1);
-        var count1_2 = GlobalRequestCounter.increment(userId1);
-        var count2_1 = GlobalRequestCounter.increment(userId2);
+        var count1_1 = globalRequestCounter.increment(userId1);
+        var count1_2 = globalRequestCounter.increment(userId1);
+        var count2_1 = globalRequestCounter.increment(userId2);
 
         // then
         assertAll(
@@ -43,14 +56,14 @@ class GlobalRequestCounterUnitTest {
         var userId2 = UUID.randomUUID();
 
         // when
-        GlobalRequestCounter.increment(userId1);
-        GlobalRequestCounter.increment(userId1);
-        GlobalRequestCounter.increment(userId2);
+        globalRequestCounter.increment(userId1);
+        globalRequestCounter.increment(userId1);
+        globalRequestCounter.increment(userId2);
 
         // then
         assertAll(
-                () -> assertThat(GlobalRequestCounter.increment(userId1)).isEqualTo(3),
-                () -> assertThat(GlobalRequestCounter.increment(userId2)).isEqualTo(2)
+                () -> assertThat(globalRequestCounter.increment(userId1)).isEqualTo(3),
+                () -> assertThat(globalRequestCounter.increment(userId2)).isEqualTo(2)
         );
     }
 
@@ -68,7 +81,7 @@ class GlobalRequestCounterUnitTest {
                 executorService.submit(() -> {
                     try {
                         for (int j = 0; j < incrementsPerThread; j++) {
-                            GlobalRequestCounter.increment(userId);
+                            globalRequestCounter.increment(userId);
                         }
                     } finally {
                         latch.countDown();
@@ -80,7 +93,7 @@ class GlobalRequestCounterUnitTest {
         }
 
         // then
-        assertThat(GlobalRequestCounter.increment(userId))
+        assertThat(globalRequestCounter.increment(userId))
                 .isEqualTo(numberOfThreads * incrementsPerThread + 1);
     }
 }

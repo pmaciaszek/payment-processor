@@ -84,7 +84,7 @@ class PaymentRequestDTOUnitTest {
                                                               String orderId,
                                                               String deviceId,
                                                               String expectedMissingField) {
-        assertThatThrownBy(() ->  new PaymentRequestDTO(userId, amount, currency, paymentMethod,
+        assertThatThrownBy(() -> new PaymentRequestDTO(userId, amount, currency, paymentMethod,
                 merchantId, orderId, deviceId))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessageContaining(expectedMissingField);

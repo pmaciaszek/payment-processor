@@ -1,36 +1,38 @@
 package com.zilch.interview.service.check;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.zilch.interview.config.properties.ServicesProperties;
+import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-final class GlobalRequestCounter {
+@Component
+class GlobalRequestCounter {
 
-    private static final Map<UUID, List<Long>> REQUESTS = new ConcurrentHashMap<>();
+    private final Cache<UUID, List<Long>> requests;
+    private final long windowSeconds;
 
-    static int increment(UUID userId) {
+    GlobalRequestCounter(ServicesProperties servicesProperties) {
+        this.windowSeconds = servicesProperties.velocityCheck().counterWindowSeconds();
+        this.requests = Caffeine.newBuilder()
+                .expireAfterAccess(Duration.ofSeconds(windowSeconds))
+                .build();
+    }
+
+    int increment(UUID userId) {
         long now = Instant.now().getEpochSecond();
 
-        REQUESTS.computeIfAbsent(userId, key -> new ArrayList<>());
-        List<Long> timestamps = REQUESTS.get(userId);
+        var timestamps = requests.get(userId, key -> new ArrayList<>());
 
         synchronized (timestamps) {
             timestamps.add(now);
-
-            timestamps.removeIf(requestTimeStamp -> requestTimeStamp < now - 10);
-
+            timestamps.removeIf(requestTimeStamp -> requestTimeStamp < now - windowSeconds);
             return timestamps.size();
         }
-    }
-
-    static void reset() {
-        REQUESTS.clear();
     }
 }

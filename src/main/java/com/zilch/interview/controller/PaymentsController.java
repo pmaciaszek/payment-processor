@@ -22,7 +22,7 @@ public class PaymentsController {
 
     @PostMapping
     public void processPayment(@RequestHeader("X-Request-ID") @NotBlank String requestId,
-                               @Valid @RequestBody PaymentRequestDTO  requestDTO) {
+                               @Valid @RequestBody PaymentRequestDTO requestDTO) {
         paymentOrchestrator.processPayment(requestId, requestDTO);
     }
 }

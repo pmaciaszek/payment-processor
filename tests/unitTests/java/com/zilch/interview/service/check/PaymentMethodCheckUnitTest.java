@@ -1,7 +1,7 @@
 package com.zilch.interview.service.check;
 
 import com.zilch.interview.dto.BlikPaymentMethodDTO;
-import com.zilch.interview.dto.PaymentMethodDTO;
+import com.zilch.interview.dto.CardPaymentMethodDTO;
 import com.zilch.interview.enums.CheckStage;
 import com.zilch.interview.enums.PaymentMethodType;
 import com.zilch.interview.model.CheckResult;
@@ -16,6 +16,7 @@ import java.util.List;
 
 import static com.zilch.interview.utils.PaymentRequestDTOProvider.getPaymentDTORequestBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -28,47 +29,73 @@ class PaymentMethodCheckUnitTest {
     private PaymentMethodValidator<BlikPaymentMethodDTO> blikValidator;
 
     @Mock
-    private PaymentMethodValidator<PaymentMethodDTO> otherValidator;
+    private PaymentMethodValidator<CardPaymentMethodDTO> cardValidator;
 
     private PaymentMethodCheck paymentMethodCheck;
 
     @BeforeEach
     void setUp() {
-        paymentMethodCheck = new PaymentMethodCheck(List.of(blikValidator, otherValidator));
+        paymentMethodCheck = new PaymentMethodCheck(List.of(blikValidator, cardValidator));
     }
 
     @Test
     void shouldReturnOkWhenNoValidatorsAreApplicable() {
         // given
-        var requestDTO = getPaymentDTORequestBuilder().build(); // Default is BLIK but we can mock validators to not be applicable
+        var requestDTO = getPaymentDTORequestBuilder().build();
         when(blikValidator.isApplicable(any())).thenReturn(false);
-        when(otherValidator.isApplicable(any())).thenReturn(false);
+        when(cardValidator.isApplicable(any())).thenReturn(false);
 
         // when
         var result = paymentMethodCheck.check(requestDTO);
 
         // then
-        assertThat(result.valid()).isTrue();
-        verify(blikValidator, never()).validate(any());
-        verify(otherValidator, never()).validate(any());
+        assertAll(
+                () -> assertThat(result.valid()).isTrue(),
+                () -> verify(blikValidator, never()).validate(any()),
+                () -> verify(cardValidator, never()).validate(any())
+        );
     }
 
     @Test
-    void shouldReturnOkWhenApplicableValidatorSucceeds() {
+    void shouldReturnOkWhenBlikValidatorSucceeds() {
         // given
-        var blikMethod = new BlikPaymentMethodDTO(PaymentMethodType.BLIK, "123456");
+        var blikMethod = new BlikPaymentMethodDTO(PaymentMethodType.BLIK, "654321");
         var requestDTO = getPaymentDTORequestBuilder().paymentMethod(blikMethod).build();
-        
+
         when(blikValidator.isApplicable(PaymentMethodType.BLIK)).thenReturn(true);
-        when(blikValidator.validate(blikMethod)).thenReturn(CheckResult.ok());
-        when(otherValidator.isApplicable(PaymentMethodType.BLIK)).thenReturn(false);
+        when(blikValidator.validate(requestDTO)).thenReturn(CheckResult.ok());
+        when(cardValidator.isApplicable(PaymentMethodType.BLIK)).thenReturn(false);
 
         // when
         var result = paymentMethodCheck.check(requestDTO);
 
         // then
-        assertThat(result.valid()).isTrue();
-        verify(blikValidator).validate(blikMethod);
+        assertAll(
+                () -> assertThat(result.valid()).isTrue(),
+                () -> verify(blikValidator).validate(requestDTO),
+                () -> verify(cardValidator, never()).validate(any())
+        );
+    }
+
+    @Test
+    void shouldReturnOkWhenCardValidatorSucceeds() {
+        // given
+        var cardMethod = new CardPaymentMethodDTO(PaymentMethodType.CARD, "tok_123");
+        var requestDTO = getPaymentDTORequestBuilder().paymentMethod(cardMethod).build();
+
+        when(blikValidator.isApplicable(PaymentMethodType.CARD)).thenReturn(false);
+        when(cardValidator.isApplicable(PaymentMethodType.CARD)).thenReturn(true);
+        when(cardValidator.validate(requestDTO)).thenReturn(CheckResult.ok());
+
+        // when
+        var result = paymentMethodCheck.check(requestDTO);
+
+        // then
+        assertAll(
+                () -> assertThat(result.valid()).isTrue(),
+                () -> verify(cardValidator).validate(requestDTO),
+                () -> verify(blikValidator, never()).validate(any())
+        );
     }
 
     @Test
@@ -79,14 +106,16 @@ class PaymentMethodCheckUnitTest {
         var failure = CheckResult.fail("Invalid BLIK");
 
         when(blikValidator.isApplicable(PaymentMethodType.BLIK)).thenReturn(true);
-        when(blikValidator.validate(blikMethod)).thenReturn(failure);
+        when(blikValidator.validate(requestDTO)).thenReturn(failure);
 
         // when
         var result = paymentMethodCheck.check(requestDTO);
 
         // then
-        assertThat(result.valid()).isFalse();
-        assertThat(result.reason()).isEqualTo("Invalid BLIK");
+        assertAll(
+                () -> assertThat(result.valid()).isFalse(),
+                () -> assertThat(result.reason()).isEqualTo("Invalid BLIK")
+        );
     }
 
     @Test

@@ -1,0 +1,25 @@
+{
+  "id": "33b16c2c-fcbd-465f-bd29-8e60d1e5e663",
+  "request": {
+    "method": "POST",
+    "url": "/v1/card/validation",
+    "bodyPatterns": [
+      {
+        "matchesJsonPath": "$.cardToken"
+      }
+    ]
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "status": "ACTIVE",
+      "limits": {
+        "maxAmount": 1000.00,
+        "currency": "GBP"
+      }
+    }
+  }
+}

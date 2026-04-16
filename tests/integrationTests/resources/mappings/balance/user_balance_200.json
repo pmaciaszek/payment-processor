@@ -1,0 +1,17 @@
+{
+  "id": "8ff5cb0f-9d23-40c3-86f2-86526e1a46fb",
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/v1/balance/[a-f0-9-]{36}"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "runningBalance": 100.00,
+      "currency": "GBP"
+    }
+  }
+}

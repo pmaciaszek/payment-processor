@@ -8,8 +8,8 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 @ConfigurationPropertiesScan
 public class PaymentProcessorApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(PaymentProcessorApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(PaymentProcessorApplication.class, args);
+    }
 
 }

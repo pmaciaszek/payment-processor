@@ -1,6 +1,6 @@
 server:
   servlet:
-    context-path: /payment-processor
+    context-path: /payment-processor/api
 
 spring:
   application:
@@ -11,6 +11,7 @@ spring:
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategySnakeCaseImpl
   liquibase:
+    enabled: true
     default-schema: payment_processor
   main:
     banner-mode: off
@@ -29,6 +30,10 @@ application:
           host: http://localhost:1010
           endpoints:
             user-balance: "/v1/balance/{userId}"
+        card:
+          host: http://localhost:1020
+          endpoints:
+            card-validation: "/v1/card/validation"
     service:
       operation-lock:
         cache:
@@ -37,6 +42,7 @@ application:
           max-size: 10_000
         max-retries: 5
       velocity-check:
+        counter-window-seconds: 10
         max-request-count: 5
 
 management:

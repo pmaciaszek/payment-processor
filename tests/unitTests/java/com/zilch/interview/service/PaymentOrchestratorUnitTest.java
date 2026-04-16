@@ -50,12 +50,12 @@ class PaymentOrchestratorUnitTest {
         // then
         var supplierCaptor = ArgumentCaptor.forClass(Supplier.class);
         verify(operationLockService).execute(eq(idempotencyKey), supplierCaptor.capture());
-        
+
         // verify supplier execution
         var capturedSupplier = supplierCaptor.getValue();
         when(paymentService.processPayment(requestDTO)).thenReturn(expectedResult);
         var actualResult = capturedSupplier.get();
-        
+
         assertThat(actualResult).isEqualTo(expectedResult);
         verify(paymentService).processPayment(requestDTO);
     }

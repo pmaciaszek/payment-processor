@@ -102,7 +102,7 @@ class PaymentRequestValidatorServiceUnitTest {
         // given
         var validationCheck2 = mock(PaymentRequestCheck.class);
         when(validationCheck2.getCheckStage()).thenReturn(CheckStage.VALIDATION);
-        
+
         validatorService = new PaymentRequestValidatorService(
                 List.of(preValidationCheck1, preValidationCheck2, otherStageCheck, validationCheck2)
         );

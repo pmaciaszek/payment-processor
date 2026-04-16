@@ -1,6 +1,7 @@
 package com.zilch.interview.config;
 
 import com.zilch.interview.client.handler.BalanceClientErrorHandler;
+import com.zilch.interview.client.handler.CardClientErrorHandler;
 import com.zilch.interview.config.properties.RestClientProperties;
 import com.zilch.interview.config.properties.RestClientsProperties;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,13 @@ public class RestClientsConfiguration {
     public RestClient balanceRestClient(RestClientsProperties restClientsProperties,
                                         BalanceClientErrorHandler balanceClientErrorHandler) {
         return restClientBuilder(restClientsProperties.balance(), balanceClientErrorHandler)
+                .build();
+    }
+
+    @Bean
+    public RestClient cardRestClient(RestClientsProperties restClientsProperties,
+                                     CardClientErrorHandler cardClientErrorHandler) {
+        return restClientBuilder(restClientsProperties.card(), cardClientErrorHandler)
                 .build();
     }
 

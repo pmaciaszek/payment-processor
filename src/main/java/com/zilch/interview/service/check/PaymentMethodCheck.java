@@ -13,15 +13,14 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class PaymentMethodCheck implements PaymentRequestCheck {
-    
+
     private final List<PaymentMethodValidator<? extends PaymentMethodDTO>> validators;
-    
+
     @Override
-    @SuppressWarnings("unchecked")
     public CheckResult check(PaymentRequestDTO requestDTO) {
         return validators.stream()
                 .filter(validator -> validator.isApplicable(requestDTO.paymentMethod().type()))
-                .map(validator -> ((PaymentMethodValidator<PaymentMethodDTO>) validator).validate(requestDTO.paymentMethod()))
+                .map(validator -> validator.validate(requestDTO))
                 .filter(result -> !result.valid())
                 .findFirst()
                 .orElse(CheckResult.ok());

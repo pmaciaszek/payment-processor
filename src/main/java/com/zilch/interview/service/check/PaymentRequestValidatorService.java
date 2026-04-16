@@ -1,5 +1,5 @@
 package com.zilch.interview.service.check;
-  
+
 import com.zilch.interview.dto.PaymentRequestDTO;
 import com.zilch.interview.enums.CheckStage;
 import com.zilch.interview.exception.ValidationCheckException;
@@ -44,7 +44,11 @@ public class PaymentRequestValidatorService {
                 .forEach(result -> logError(requestDTO.orderId(), result));
 
         if (!results.stream().allMatch(CheckResult::valid)) {
-            throw ValidationCheckException.empty();
+            var firstError = results.stream()
+                    .filter(result -> !result.valid())
+                    .findFirst()
+                    .orElseThrow();
+            throw ValidationCheckException.of(firstError);
         }
     }
 

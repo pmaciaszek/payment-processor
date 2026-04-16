@@ -19,7 +19,7 @@ public class IdempotencyKeyFactoryService {
         try {
             return MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException exception) {
-            throw new IllegalStateException("SHA-256 no available", exception);
+            throw new IllegalStateException("SHA-256 not available", exception);
         }
     });
 

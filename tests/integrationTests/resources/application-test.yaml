@@ -1,17 +1,28 @@
 spring:
   datasource:
-    url: jdbc:tc:postgresql:///
+    url: jdbc:tc:postgresql:17-alpine:///test-db?TC_TMPFS=/testtmpfs:rw
     username: sa
     password: sa
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
     hikari:
-        maximum-pool-size: 2
+      maximum-pool-size: 2
+  liquibase:
+    enabled: true
+    default-schema: public
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        default_schema: public
 
 application:
   config:
     rest:
       clients:
         balance:
+          host: http://localhost:${wiremock.server.port}
+        card:
           host: http://localhost:${wiremock.server.port}
     service:
       operation-lock:
