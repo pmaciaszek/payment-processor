@@ -4,7 +4,6 @@ import com.zilch.interview.entity.UserEntity;
 import com.zilch.interview.enums.UserAccountStatus;
 import com.zilch.interview.exception.PaymentProcessorErrorResponseDTO;
 import com.zilch.interview.utils.base.IntegrationTest;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,12 +14,6 @@ import static com.zilch.interview.utils.provider.PaymentRequestDTOProvider.getPa
 import static org.assertj.core.api.Assertions.assertThat;
 
 class UserCheckIntegrationTest extends IntegrationTest {
-
-    @BeforeEach
-    void setUp() {
-        userDeviceRepository.deleteAll();
-        userRepository.deleteAll();
-    }
 
     @Test
     void shouldReturnBadRequestWhenUserNotFound() {

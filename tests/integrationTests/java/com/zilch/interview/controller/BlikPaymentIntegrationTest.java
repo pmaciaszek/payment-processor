@@ -1,7 +1,6 @@
 package com.zilch.interview.controller;
 
 import com.zilch.interview.dto.BlikPaymentMethodDTO;
-import com.zilch.interview.dto.PaymentRequestDTO;
 import com.zilch.interview.dto.PaymentResponseDTO;
 import com.zilch.interview.entity.UserDeviceEntity;
 import com.zilch.interview.entity.UserDeviceId;
@@ -12,29 +11,16 @@ import com.zilch.interview.enums.TransferStatus;
 import com.zilch.interview.enums.UserAccountStatus;
 import com.zilch.interview.exception.PaymentProcessorErrorResponseDTO;
 import com.zilch.interview.utils.base.IntegrationTest;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.UUID;
-
 import static com.zilch.interview.utils.provider.PaymentRequestDTOProvider.getPaymentDTORequestBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 class BlikPaymentIntegrationTest extends IntegrationTest {
 
     private static final String DEVICE_ID = "device-blik-123";
-
-    @BeforeEach
-    void setUp() {
-        userDeviceRepository.deleteAll();
-        userRepository.deleteAll();
-        userTransferRepository.deleteAll();
-    }
 
     @Test
     void shouldProcessBlikPaymentSuccessfully() {
@@ -45,7 +31,6 @@ class BlikPaymentIntegrationTest extends IntegrationTest {
         userDeviceRepository.save(UserDeviceEntity.builder()
                 .id(new UserDeviceId(user.getId(), DEVICE_ID))
                 .trusted(true)
-                .lastUsedAt(LocalDateTime.now())
                 .build());
 
         var requestDTO = getPaymentDTORequestBuilder()
@@ -85,7 +70,6 @@ class BlikPaymentIntegrationTest extends IntegrationTest {
         userDeviceRepository.save(UserDeviceEntity.builder()
                 .id(new UserDeviceId(user.getId(), DEVICE_ID))
                 .trusted(true)
-                .lastUsedAt(LocalDateTime.now())
                 .build());
 
         var requestDTO = getPaymentDTORequestBuilder()

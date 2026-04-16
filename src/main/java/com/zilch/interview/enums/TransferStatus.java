@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum TransferStatus {
+    PENDING(false),
     CAPTURED(true),
     FAILED(false);
 

@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -18,6 +20,7 @@ import java.util.concurrent.CompletableFuture;
 public class PaymentRequestValidatorService {
 
     private final List<PaymentRequestCheck> checks;
+    private final ExecutorService validationExecutor;
 
     public void runChecks(PaymentRequestDTO requestDTO) {
         performPreValidationChecks(requestDTO);
@@ -33,7 +36,10 @@ public class PaymentRequestValidatorService {
 
     private void performValidationChecks(PaymentRequestDTO requestDTO) {
         var parallelChecks = getChecks(CheckStage.VALIDATION).stream()
-                .map(check -> CompletableFuture.supplyAsync(() -> check.check(requestDTO)))
+                .map(check -> CompletableFuture.supplyAsync(
+                        () -> check.check(requestDTO),
+                        validationExecutor)
+                        .orTimeout(5, TimeUnit.SECONDS))
                 .toList();
 
         var results = CompletableFuture.allOf(parallelChecks.toArray(new CompletableFuture[0]))

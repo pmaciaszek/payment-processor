@@ -10,9 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
-
 import static com.zilch.interview.utils.provider.PaymentRequestDTOProvider.getPaymentDTORequestBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -54,7 +51,6 @@ class DeviceCheckIntegrationTest extends IntegrationTest {
         userDeviceRepository.save(UserDeviceEntity.builder()
                 .id(new UserDeviceId(user.getId(), deviceId))
                 .trusted(false)
-                .lastUsedAt(LocalDateTime.now())
                 .build());
 
         var request = getPaymentDTORequestBuilder()

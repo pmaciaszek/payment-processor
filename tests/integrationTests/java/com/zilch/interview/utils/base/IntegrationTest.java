@@ -6,6 +6,7 @@ import com.zilch.interview.repository.UserTransferRepository;
 import com.zilch.interview.utils.configs.RestTestClientConfiguration;
 import com.zilch.interview.utils.configs.WiremockConfiguration;
 import com.zilch.interview.utils.rest.RestTestClient;
+import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate;
@@ -36,6 +37,13 @@ public abstract class IntegrationTest {
 
     static {
         POSTGRESQL_CONTAINER.start();
+    }
+
+    @BeforeEach
+    void setUp() {
+        userDeviceRepository.deleteAll();
+        userRepository.deleteAll();
+        userTransferRepository.deleteAll();
     }
 
     protected static final String PAYMENTS_ENDPOINT = "/v1/payments";

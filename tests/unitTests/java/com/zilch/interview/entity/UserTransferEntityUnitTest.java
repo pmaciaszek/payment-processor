@@ -1,6 +1,5 @@
 package com.zilch.interview.entity;
 
-import com.zilch.interview.dto.transfer.TransferResponseDTO;
 import com.zilch.interview.enums.TransferStatus;
 import com.zilch.interview.utils.PaymentRequestDTOProvider;
 import org.junit.jupiter.api.Test;
@@ -24,19 +23,15 @@ class UserTransferEntityUnitTest {
                 .orderId("O-1")
                 .build();
 
-        var transferResult = new TransferResponseDTO("T-1", TransferStatus.CAPTURED, "OK");
-
         // when
-        var entity = UserTransferEntity.fromTransferResult(transferResult, requestDTO);
+        var entity = UserTransferEntity.ofPendingTransfer(requestDTO);
 
         // then
         assertThat(entity)
-                .returns("T-1", UserTransferEntity::getId)
                 .returns(userId, UserTransferEntity::getUserId)
                 .returns(BigDecimal.valueOf(100.50), UserTransferEntity::getAmount)
                 .returns("M-1", UserTransferEntity::getMerchantId)
                 .returns("O-1", UserTransferEntity::getOrderId)
-                .returns(TransferStatus.CAPTURED, UserTransferEntity::getStatus)
-                .returns("OK", UserTransferEntity::getStatusDescription);
+                .returns(TransferStatus.PENDING, UserTransferEntity::getStatus);
     }
 }

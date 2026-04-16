@@ -12,9 +12,10 @@
             </not>
         </preConditions>
         <createTable tableName="user_transfers">
-            <column name="id" type="TEXT">
+            <column name="id" type="UUID">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
+            <column name="transfer_id" type="TEXT"/>
             <column name="user_id" type="UUID">
                 <constraints nullable="false"/>
             </column>

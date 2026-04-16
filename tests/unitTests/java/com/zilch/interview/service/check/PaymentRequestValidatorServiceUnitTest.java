@@ -11,6 +11,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static com.zilch.interview.utils.PaymentRequestDTOProvider.getPaymentDTORequestBuilder;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -31,6 +33,8 @@ class PaymentRequestValidatorServiceUnitTest {
     @Mock
     private PaymentRequestCheck otherStageCheck;
 
+    private final ExecutorService validationExecutor = Executors.newSingleThreadExecutor();
+
     @InjectMocks
     private PaymentRequestValidatorService validatorService;
 
@@ -41,7 +45,8 @@ class PaymentRequestValidatorServiceUnitTest {
         when(otherStageCheck.getCheckStage()).thenReturn(CheckStage.VALIDATION);
 
         validatorService = new PaymentRequestValidatorService(
-                List.of(preValidationCheck1, preValidationCheck2, otherStageCheck)
+                List.of(preValidationCheck1, preValidationCheck2, otherStageCheck),
+                validationExecutor
         );
     }
 
@@ -104,7 +109,8 @@ class PaymentRequestValidatorServiceUnitTest {
         when(validationCheck2.getCheckStage()).thenReturn(CheckStage.VALIDATION);
 
         validatorService = new PaymentRequestValidatorService(
-                List.of(preValidationCheck1, preValidationCheck2, otherStageCheck, validationCheck2)
+                List.of(preValidationCheck1, preValidationCheck2, otherStageCheck, validationCheck2),
+                validationExecutor
         );
 
         var requestDTO = getPaymentDTORequestBuilder().build();

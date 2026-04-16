@@ -1,12 +1,13 @@
 package com.zilch.interview.entity;
 
 import com.zilch.interview.dto.PaymentRequestDTO;
-import com.zilch.interview.dto.transfer.TransferResponseDTO;
 import com.zilch.interview.enums.TransferStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -32,12 +33,16 @@ import java.util.UUID;
 public class UserTransferEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @EqualsAndHashCode.Include
     @Column(nullable = false)
-    private String id;
+    private UUID id;
 
     @Column(nullable = false)
     private UUID userId;
+
+    @Column
+    private String transferId;
 
     @Column(nullable = false)
     private BigDecimal amount;
@@ -59,15 +64,13 @@ public class UserTransferEntity {
     @Column( nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    public static UserTransferEntity fromTransferResult(TransferResponseDTO transferResult, PaymentRequestDTO requestDTO) {
+    public static UserTransferEntity ofPendingTransfer(PaymentRequestDTO requestDTO) {
         return UserTransferEntity.builder()
-                .id(transferResult.id())
                 .userId(requestDTO.userId())
                 .amount(requestDTO.amount())
                 .merchantId(requestDTO.merchantId())
                 .orderId(requestDTO.orderId())
-                .status(transferResult.status())
-                .statusDescription(transferResult.reason())
+                .status(TransferStatus.PENDING)
                 .build();
     }
 }

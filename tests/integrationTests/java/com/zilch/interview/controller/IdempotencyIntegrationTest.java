@@ -11,7 +11,6 @@ import com.zilch.interview.enums.TransferStatus;
 import com.zilch.interview.enums.UserAccountStatus;
 import com.zilch.interview.exception.PaymentProcessorErrorResponseDTO;
 import com.zilch.interview.utils.base.IntegrationTest;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,13 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 class IdempotencyIntegrationTest extends IntegrationTest {
 
     private static final String DEVICE_ID = "device-idempotency-123";
-
-    @BeforeEach
-    void setUp() {
-        userDeviceRepository.deleteAll();
-        userRepository.deleteAll();
-        userTransferRepository.deleteAll();
-    }
 
     @Test
     void shouldReturnSameResponseForSameIdempotencyKey() {
