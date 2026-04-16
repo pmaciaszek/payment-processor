@@ -11,11 +11,11 @@ import org.springframework.web.client.RestClient;
 @RequiredArgsConstructor
 public class CardClient {
 
-    private final RestClient balanceRestClient;
+    private final RestClient cardRestClient;
     private final RestClientsProperties restClientsProperties;
 
     public CardValidationResponseDTO validateCard(CardValidationRequestDTO requestDTO) {
-        return balanceRestClient.post()
+        return cardRestClient.post()
                 .uri(restClientsProperties.card().getEndpoints().cardValidation())
                 .body(requestDTO)
                 .retrieve()

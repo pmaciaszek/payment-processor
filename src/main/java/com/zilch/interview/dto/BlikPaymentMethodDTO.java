@@ -6,4 +6,8 @@ import lombok.NonNull;
 
 public record BlikPaymentMethodDTO(@NonNull PaymentMethodType type,
                                    @NonNull @Pattern(regexp = "\\d{6}") String blikCode) implements PaymentMethodDTO {
+    @Override
+    public String attribute() {
+        return blikCode;
+    }
 }

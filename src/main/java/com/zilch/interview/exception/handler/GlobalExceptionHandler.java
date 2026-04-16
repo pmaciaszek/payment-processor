@@ -42,7 +42,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                                                                   HttpStatusCode status,
                                                                   WebRequest request) {
         var errors = extractErrors(exception);
-        log.error("An error occurred: %s".formatted(errors), exception);
+        log.error("An error occurred: {}", errors, exception);
         return ResponseEntity
                 .status(status)
                 .body(new PaymentProcessorErrorResponseDTO(status.toString(), errors));

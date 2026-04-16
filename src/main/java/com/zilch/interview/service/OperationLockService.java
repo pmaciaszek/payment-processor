@@ -70,7 +70,6 @@ public class OperationLockService {
 
     private PaymentResult performSupplierAction(IdempotencyKey idempotencyKey, Supplier<PaymentResult> supplier) {
         var newRetryCount = getNextRetryCounterValue(idempotencyKey.key());
-        try {
             var result = supplier.get();
             cache.put(idempotencyKey.key(),
                     CacheEntry.builder()
@@ -79,15 +78,6 @@ public class OperationLockService {
                             .requestBodyHash(idempotencyKey.requestBodyHash())
                             .build());
             return result;
-        } catch (Exception exception) {
-            cache.put(idempotencyKey.key(),
-                    CacheEntry.builder()
-                            .paymentResult(new PaymentResult(false, null))
-                            .retryCount(newRetryCount)
-                            .requestBodyHash(idempotencyKey.requestBodyHash())
-                            .build());
-            throw exception;
-        }
     }
 
     private int getNextRetryCounterValue(String idempotencyKey) {

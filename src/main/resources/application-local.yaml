@@ -1,4 +1,8 @@
 spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: sa
+    password: sa
   jpa:
     show-sql: true
 
@@ -8,6 +12,8 @@ application:
       clients:
         balance:
           host: http://localhost:1010
+        card:
+          host: http://localhost:1020
 
 management:
   metrics:

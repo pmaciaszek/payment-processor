@@ -31,14 +31,16 @@ class DeviceCheckIntegrationTest extends IntegrationTest {
                 .build();
 
         // When
-        var response = restTestClient.post("/v1/payments", UUID.randomUUID().toString(), request, PaymentProcessorErrorResponseDTO.class);
+        var response = restTestClient.post(PAYMENTS_ENDPOINT, request, PaymentProcessorErrorResponseDTO.class);
 
-        // Then
+        // then
         assertThat(response)
                 .returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode)
                 .extracting(ResponseEntity::getBody)
                 .isNotNull()
                 .returns("Device not recognized", PaymentProcessorErrorResponseDTO::message);
+        assertThat(userTransferRepository.findAll())
+                .isEmpty();
     }
 
     @Test
@@ -60,13 +62,15 @@ class DeviceCheckIntegrationTest extends IntegrationTest {
                 .deviceId(deviceId).build();
 
         // When
-        var response = restTestClient.post("/v1/payments", UUID.randomUUID().toString(), request, PaymentProcessorErrorResponseDTO.class);
+        var response = restTestClient.post(PAYMENTS_ENDPOINT, request, PaymentProcessorErrorResponseDTO.class);
 
-        // Then
+        // then
         assertThat(response)
                 .returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode)
                 .extracting(ResponseEntity::getBody)
                 .isNotNull()
                 .returns("Device is not trusted", PaymentProcessorErrorResponseDTO::message);
+        assertThat(userTransferRepository.findAll())
+                .isEmpty();
     }
 }

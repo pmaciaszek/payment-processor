@@ -1,6 +1,7 @@
 package com.zilch.interview.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.zilch.interview.enums.PaymentMethodType;
@@ -17,4 +18,7 @@ import com.zilch.interview.enums.PaymentMethodType;
 public interface PaymentMethodDTO {
 
     PaymentMethodType type();
+
+    @JsonIgnore
+    String attribute();
 }

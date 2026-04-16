@@ -29,7 +29,6 @@ public class BalanceClientErrorHandler implements ResponseErrorHandler {
 
     @Override
     public void handleError(URI url, HttpMethod method, ClientHttpResponse response) throws IOException {
-        ResponseErrorHandler.super.handleError(url, method, response);
         throw new BalanceResponseException(readErrorBody(response));
     }
 
@@ -38,7 +37,7 @@ public class BalanceClientErrorHandler implements ResponseErrorHandler {
         try {
             return objectMapper.readValue(stringBody, BalanceErrorResponseDTO.class);
         } catch (JacksonException exception) {
-            log.error("Could not deserialize dummy domain error {}", stringBody, exception);
+            log.error("Could not deserialize balance domain error {}", stringBody, exception);
             return new BalanceErrorResponseDTO(
                     response.getStatusCode().value(),
                     "Unrecognized error occurred.");

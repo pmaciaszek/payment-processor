@@ -17,10 +17,10 @@ import java.util.UUID;
 @AllArgsConstructor
 @Embeddable
 public class UserDeviceId implements Serializable {
-    @Column(name = "user_id", nullable = false)
+    @Column(nullable = false)
     private UUID userId;
 
-    @Column(name = "device_id", nullable = false)
+    @Column(nullable = false)
     private String deviceId;
 
     public static UserDeviceId of(PaymentRequestDTO requestDTO) {

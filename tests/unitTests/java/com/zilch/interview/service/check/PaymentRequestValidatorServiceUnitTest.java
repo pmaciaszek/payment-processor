@@ -90,7 +90,7 @@ class PaymentRequestValidatorServiceUnitTest {
         // when & then
         assertThatThrownBy(() -> validatorService.runChecks(requestDTO))
                 .isInstanceOf(ValidationCheckException.class)
-                .hasMessage("There were some validation errors");
+                .hasMessage("Validation error");
 
         verify(preValidationCheck1).check(requestDTO);
         verify(preValidationCheck2).check(requestDTO);
@@ -116,7 +116,7 @@ class PaymentRequestValidatorServiceUnitTest {
         // when & then
         assertThatThrownBy(() -> validatorService.runChecks(requestDTO))
                 .isInstanceOf(ValidationCheckException.class)
-                .hasMessage("There were some validation errors");
+                .hasMessage("Error 1");
 
         verify(preValidationCheck1).check(requestDTO);
         verify(preValidationCheck2).check(requestDTO);

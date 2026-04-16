@@ -5,6 +5,8 @@ server:
 spring:
   application:
     name: payment-processor
+  datasource:
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: none
@@ -27,11 +29,9 @@ application:
       socket-timeout: PT60S
       clients:
         balance:
-          host: http://localhost:1010
           endpoints:
             user-balance: "/v1/balance/{userId}"
         card:
-          host: http://localhost:1020
           endpoints:
             card-validation: "/v1/card/validation"
     service:

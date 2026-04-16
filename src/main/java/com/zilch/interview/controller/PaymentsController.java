@@ -1,6 +1,7 @@
 package com.zilch.interview.controller;
 
 import com.zilch.interview.dto.PaymentRequestDTO;
+import com.zilch.interview.dto.PaymentResponseDTO;
 import com.zilch.interview.service.PaymentOrchestrator;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -21,8 +22,8 @@ public class PaymentsController {
     private final PaymentOrchestrator paymentOrchestrator;
 
     @PostMapping
-    public void processPayment(@RequestHeader("X-Request-ID") @NotBlank String requestId,
-                               @Valid @RequestBody PaymentRequestDTO requestDTO) {
-        paymentOrchestrator.processPayment(requestId, requestDTO);
+    public PaymentResponseDTO processPayment(@RequestHeader("X-Request-ID") @NotBlank String requestId,
+                                             @Valid @RequestBody PaymentRequestDTO requestDTO) {
+        return paymentOrchestrator.processPayment(requestId, requestDTO);
     }
 }

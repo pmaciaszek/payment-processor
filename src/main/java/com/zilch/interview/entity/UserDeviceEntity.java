@@ -34,7 +34,4 @@ public class UserDeviceEntity {
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
-
-    @Column(nullable = false)
-    private LocalDateTime lastUsedAt;
 }

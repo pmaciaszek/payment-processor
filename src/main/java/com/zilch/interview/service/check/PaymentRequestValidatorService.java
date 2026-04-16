@@ -6,6 +6,7 @@ import com.zilch.interview.exception.ValidationCheckException;
 import com.zilch.interview.model.CheckResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,6 +26,8 @@ public class PaymentRequestValidatorService {
 
     private void performPreValidationChecks(PaymentRequestDTO requestDTO) {
         getChecks(CheckStage.PRE_VALIDATION)
+                .stream()
+                .sorted(AnnotationAwareOrderComparator.INSTANCE)
                 .forEach(check -> performPreValidationCheck(check, requestDTO));
     }
 

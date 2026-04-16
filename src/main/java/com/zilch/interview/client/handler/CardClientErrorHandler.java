@@ -29,7 +29,6 @@ public class CardClientErrorHandler implements ResponseErrorHandler {
 
     @Override
     public void handleError(URI url, HttpMethod method, ClientHttpResponse response) throws IOException {
-        ResponseErrorHandler.super.handleError(url, method, response);
         throw new CardResponseException(readErrorBody(response));
     }
 
@@ -38,7 +37,7 @@ public class CardClientErrorHandler implements ResponseErrorHandler {
         try {
             return objectMapper.readValue(stringBody, CardErrorResponseDTO.class);
         } catch (JacksonException exception) {
-            log.error("Could not deserialize dummy domain error {}", stringBody, exception);
+            log.error("Could not deserialize card domain error {}", stringBody, exception);
             return new CardErrorResponseDTO("CRD-999", "Unknown error occurred.");
         }
     }

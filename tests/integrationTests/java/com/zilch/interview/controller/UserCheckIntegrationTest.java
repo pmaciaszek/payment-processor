@@ -31,13 +31,12 @@ class UserCheckIntegrationTest extends IntegrationTest {
                 .build();
 
         // when
-        var response = restTestClient.post("/v1/payments", UUID.randomUUID().toString(), requestDTO, PaymentProcessorErrorResponseDTO.class);
+        var response = restTestClient.post(PAYMENTS_ENDPOINT, requestDTO, PaymentProcessorErrorResponseDTO.class);
 
         // then
         assertThat(response)
                 .returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode)
                 .extracting(ResponseEntity::getBody)
-                .isNotNull()
                 .returns("User not found", PaymentProcessorErrorResponseDTO::message);
     }
 
@@ -52,13 +51,12 @@ class UserCheckIntegrationTest extends IntegrationTest {
                 .build();
 
         // when
-        var response = restTestClient.post("/v1/payments", UUID.randomUUID().toString(), requestDTO, PaymentProcessorErrorResponseDTO.class);
+        var response = restTestClient.post(PAYMENTS_ENDPOINT, requestDTO, PaymentProcessorErrorResponseDTO.class);
 
         // then
         assertThat(response)
                 .returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode)
                 .extracting(ResponseEntity::getBody)
-                .isNotNull()
                 .returns("User is not active", PaymentProcessorErrorResponseDTO::message);
     }
 }

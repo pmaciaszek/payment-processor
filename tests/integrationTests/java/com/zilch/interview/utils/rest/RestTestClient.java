@@ -8,14 +8,15 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
 import java.net.URI;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 public class RestTestClient {
 
     private final TestRestTemplate restTemplate;
 
-    public <T> ResponseEntity<T> get(URI uri, Class<T> responseClass) {
-        return restTemplate.exchange(uri, HttpMethod.GET, null, responseClass);
+    public <T, R> ResponseEntity<R> post(String url, T body, Class<R> responseClass) {
+        return post(url, UUID.randomUUID().toString(), body, responseClass);
     }
 
     public <T, R> ResponseEntity<R> post(String url, String requestId, T body, Class<R> responseClass) {
@@ -24,7 +25,7 @@ public class RestTestClient {
         return post(url, headers, body, responseClass);
     }
 
-    public <T, R> ResponseEntity<R> post(String url, HttpHeaders headers, T body, Class<R> responseClass) {
+    private <T, R> ResponseEntity<R> post(String url, HttpHeaders headers, T body, Class<R> responseClass) {
         return restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(body, headers), responseClass);
     }
 }
