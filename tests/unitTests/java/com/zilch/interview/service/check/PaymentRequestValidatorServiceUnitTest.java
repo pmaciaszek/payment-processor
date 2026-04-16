@@ -3,6 +3,7 @@ package com.zilch.interview.service.check;
 import com.zilch.interview.enums.CheckStage;
 import com.zilch.interview.exception.ValidationCheckException;
 import com.zilch.interview.model.CheckResult;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,8 +14,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static com.zilch.interview.utils.PaymentRequestDTOProvider.getPaymentDTORequestBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -48,6 +52,11 @@ class PaymentRequestValidatorServiceUnitTest {
                 List.of(preValidationCheck1, preValidationCheck2, otherStageCheck),
                 validationExecutor
         );
+    }
+
+    @AfterEach
+    void tearDown() {
+        validationExecutor.shutdown();
     }
 
     @Test
@@ -128,5 +137,25 @@ class PaymentRequestValidatorServiceUnitTest {
         verify(preValidationCheck2).check(requestDTO);
         verify(otherStageCheck).check(requestDTO);
         verify(validationCheck2).check(requestDTO);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenValidationCheckTimesOut() {
+        // given
+        var requestDTO = getPaymentDTORequestBuilder().build();
+        when(preValidationCheck1.check(requestDTO)).thenReturn(CheckResult.ok());
+        when(preValidationCheck2.check(requestDTO)).thenReturn(CheckResult.ok());
+        when(otherStageCheck.check(requestDTO)).thenAnswer(invocation -> {
+            TimeUnit.SECONDS.sleep(6);
+            return CheckResult.ok();
+        });
+
+        // when & then
+        assertThatThrownBy(() -> validatorService.runChecks(requestDTO))
+                .hasCauseInstanceOf(TimeoutException.class);
+
+        verify(preValidationCheck1).check(requestDTO);
+        verify(preValidationCheck2).check(requestDTO);
+        verify(otherStageCheck).check(requestDTO);
     }
 }

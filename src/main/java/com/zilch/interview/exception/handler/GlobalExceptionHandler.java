@@ -1,5 +1,7 @@
 package com.zilch.interview.exception.handler;
 
+import com.zilch.interview.exception.BalanceResponseException;
+import com.zilch.interview.exception.CardResponseException;
 import com.zilch.interview.exception.IdempotencyKeyDuplicationException;
 import com.zilch.interview.exception.PaymentProcessorErrorResponseDTO;
 import com.zilch.interview.exception.ValidationCheckException;
@@ -21,6 +23,11 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
+    @ExceptionHandler({BalanceResponseException.class, CardResponseException.class})
+    public ResponseEntity<PaymentProcessorErrorResponseDTO> handleIntegrationExceptions(Exception exception) {
+        return logExceptionAndGetResponseDTO(HttpStatus.SERVICE_UNAVAILABLE, exception);
+    }
 
     @ExceptionHandler(ValidationCheckException.class)
     public ResponseEntity<PaymentProcessorErrorResponseDTO> handleValidationCheckException(ValidationCheckException exception) {

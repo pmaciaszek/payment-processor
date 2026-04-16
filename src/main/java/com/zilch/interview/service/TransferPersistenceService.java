@@ -24,18 +24,21 @@ public class TransferPersistenceService {
 
     @Transactional
     public void updateTransferStatus(UUID id, TransferResponseDTO transferResult) {
-        userTransferRepository.findById(id).ifPresent(entity -> {
-                    entity.setStatus(transferResult.status());
-                    entity.setTransferId(transferResult.id());
-                    entity.setStatusDescription(transferResult.reason());
-        });
+        var entity = findEntityById(id);
+        entity.setStatus(transferResult.status());
+        entity.setTransferId(transferResult.id());
+        entity.setStatusDescription(transferResult.reason());
     }
 
     @Transactional
     public void markAsFailed(UUID id, String message) {
-        userTransferRepository.findById(id).ifPresent(entity -> {
-            entity.setStatus(TransferStatus.FAILED);
-            entity.setStatusDescription(message);
-        });
+        var entity = findEntityById(id);
+        entity.setStatus(TransferStatus.FAILED);
+        entity.setStatusDescription(message);
+    }
+
+    private UserTransferEntity findEntityById(UUID id) {
+        return userTransferRepository.findById(id)
+                .orElseThrow(() -> new IllegalStateException("Transfer entity not found id: " + id));
     }
 }
