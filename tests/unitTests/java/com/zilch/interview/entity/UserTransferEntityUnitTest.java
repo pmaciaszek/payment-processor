@@ -32,6 +32,7 @@ class UserTransferEntityUnitTest {
                 .returns(BigDecimal.valueOf(100.50), UserTransferEntity::getAmount)
                 .returns("M-1", UserTransferEntity::getMerchantId)
                 .returns("O-1", UserTransferEntity::getOrderId)
+                .returns(requestDTO.currency(), UserTransferEntity::getCurrency)
                 .returns(TransferStatus.PENDING, UserTransferEntity::getStatus);
     }
 }

@@ -12,8 +12,12 @@ import com.zilch.interview.exception.CardResponseException;
 import com.zilch.interview.exception.IdempotencyKeyDuplicationException;
 import com.zilch.interview.exception.PaymentProcessorErrorResponseDTO;
 import com.zilch.interview.exception.ValidationCheckException;
+import com.zilch.interview.model.CheckResult;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.http.HttpHeaders;
@@ -25,6 +29,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.util.List;
 import java.util.concurrent.CompletionException;
+import java.util.stream.Stream;
 
 @ExtendWith(OutputCaptureExtension.class)
 class GlobalExceptionHandlerUnitTest {
@@ -34,7 +39,7 @@ class GlobalExceptionHandlerUnitTest {
     @Test
     void shouldHandleValidationCheckException(CapturedOutput output) {
         // given
-        var exception = ValidationCheckException.empty();
+        var exception = ValidationCheckException.of(CheckResult.fail("validation error"));
 
         // when
         var response = handler.handleValidationCheckException(exception);
@@ -44,9 +49,8 @@ class GlobalExceptionHandlerUnitTest {
                 () -> assertThat(response)
                         .returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode)
                         .extracting(ResponseEntity::getBody)
-                        .extracting(PaymentProcessorErrorResponseDTO::message)
-                        .isEqualTo("There were some validation errors"),
-                () -> assertThat(output.getOut()).contains("An error occurred: There were some validation errors")
+                        .returns("validation error", PaymentProcessorErrorResponseDTO::message),
+                () -> assertThat(output.getOut()).contains("An error occurred: validation error")
         );
     }
 
@@ -65,8 +69,7 @@ class GlobalExceptionHandlerUnitTest {
                 () -> assertThat(response)
                         .returns(HttpStatus.CONFLICT, ResponseEntity::getStatusCode)
                         .extracting(ResponseEntity::getBody)
-                        .extracting(PaymentProcessorErrorResponseDTO::message)
-                        .isEqualTo(expectedMessage),
+                        .returns(expectedMessage, PaymentProcessorErrorResponseDTO::message),
                 () -> assertThat(output.getOut()).contains("An error occurred: " + expectedMessage)
         );
     }
@@ -85,42 +88,40 @@ class GlobalExceptionHandlerUnitTest {
                 () -> assertThat(response)
                         .returns(HttpStatus.INTERNAL_SERVER_ERROR, ResponseEntity::getStatusCode)
                         .extracting(ResponseEntity::getBody)
-                        .extracting(PaymentProcessorErrorResponseDTO::message)
-                        .isEqualTo(message),
+                        .returns(message, PaymentProcessorErrorResponseDTO::message),
                 () -> assertThat(output.getOut()).contains("An error occurred: " + message)
         );
     }
 
-    @Test
-    void shouldHandleIntegrationExceptions(CapturedOutput output) {
-        // given
-        var balanceError = new BalanceErrorResponseDTO(500, "Balance integration error");
-        var balanceException = new BalanceResponseException(balanceError);
-        var cardError = new CardErrorResponseDTO("500", "Card integration error");
-        var cardException = new CardResponseException(cardError);
-
-        var expectedBalanceMessage = "500 : Balance integration error";
-        var expectedCardMessage = "500 : Card integration error";
-
+    @ParameterizedTest
+    @MethodSource("providerForShouldHandleIntegrationExceptions")
+    void shouldHandleIntegrationExceptions(Exception exception, String errorMessage, CapturedOutput output) {
         // when
-        var balanceResponse = handler.handleIntegrationExceptions(balanceException);
-        var cardResponse = handler.handleIntegrationExceptions(cardException);
+        var response = handler.handleIntegrationExceptions(exception);
 
         // then
         assertAll(
-                () -> assertThat(balanceResponse.getStatusCode()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE),
-                () -> assertThat(balanceResponse.getBody().message()).isEqualTo(expectedBalanceMessage),
-                () -> assertThat(cardResponse.getStatusCode()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE),
-                () -> assertThat(cardResponse.getBody().message()).isEqualTo(expectedCardMessage),
-                () -> assertThat(output.getOut()).contains("An error occurred: " + expectedBalanceMessage),
-                () -> assertThat(output.getOut()).contains("An error occurred: " + expectedCardMessage)
-        );
+                () -> assertThat(response)
+                        .returns(HttpStatus.SERVICE_UNAVAILABLE, ResponseEntity::getStatusCode)
+                        .extracting(ResponseEntity::getBody)
+                        .returns(errorMessage, PaymentProcessorErrorResponseDTO::message),
+                () -> assertThat(output.getOut()).contains("An error occurred: " + errorMessage));
+    }
+
+    private static Stream<Arguments> providerForShouldHandleIntegrationExceptions() {
+        return Stream.of(
+                Arguments.of(new BalanceResponseException(
+                        new BalanceErrorResponseDTO(500, "Balance integration error")),
+                        "500 : Balance integration error"),
+                Arguments.of(new CardResponseException(
+                        new CardErrorResponseDTO("500", "Card integration error")),
+                        "500 : Card integration error"));
     }
 
     @Test
     void shouldHandleCompletionExceptionWithValidationCause(CapturedOutput output) {
         // given
-        var validationException = ValidationCheckException.empty();
+        var validationException = ValidationCheckException.of(CheckResult.fail("validation error"));
         var completionException = new CompletionException(validationException);
 
         // when
@@ -128,9 +129,11 @@ class GlobalExceptionHandlerUnitTest {
 
         // then
         assertAll(
-                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST),
-                () -> assertThat(response.getBody().message()).isEqualTo("There were some validation errors"),
-                () -> assertThat(output.getOut()).contains("An error occurred: There were some validation errors")
+                () -> assertThat(response)
+                        .returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode)
+                        .extracting(ResponseEntity::getBody)
+                        .returns("validation error", PaymentProcessorErrorResponseDTO::message),
+                () -> assertThat(output.getOut()).contains("An error occurred: validation error")
         );
     }
 

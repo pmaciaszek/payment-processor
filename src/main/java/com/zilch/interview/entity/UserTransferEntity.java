@@ -48,6 +48,9 @@ public class UserTransferEntity {
     private BigDecimal amount;
 
     @Column(nullable = false)
+    private String currency;
+
+    @Column(nullable = false)
     private String merchantId;
 
     @Column(nullable = false)
@@ -68,6 +71,7 @@ public class UserTransferEntity {
         return UserTransferEntity.builder()
                 .userId(requestDTO.userId())
                 .amount(requestDTO.amount())
+                .currency(requestDTO.currency())
                 .merchantId(requestDTO.merchantId())
                 .orderId(requestDTO.orderId())
                 .status(TransferStatus.PENDING)

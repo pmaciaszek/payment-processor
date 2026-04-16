@@ -8,7 +8,7 @@
     <changeSet id="3-init-user-transfer-table" author="pmaciaszek">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="user_transfer"/>
+                <tableExists tableName="user_transfers"/>
             </not>
         </preConditions>
         <createTable tableName="user_transfers">
@@ -20,6 +20,9 @@
                 <constraints nullable="false"/>
             </column>
             <column name="amount" type="DECIMAL">
+                <constraints nullable="false"/>
+            </column>
+            <column name="currency" type="TEXT">
                 <constraints nullable="false"/>
             </column>
             <column name="merchant_id" type="TEXT">
@@ -43,6 +46,9 @@
                 referencedColumnNames="id"
                 onDelete="CASCADE"
                 constraintName="fk_user_transfers"/>
+        <createIndex tableName="user_transfers" indexName="idx_user_transfers_user_id">
+            <column name="user_id"/>
+        </createIndex>
     </changeSet>
 
 </databaseChangeLog>

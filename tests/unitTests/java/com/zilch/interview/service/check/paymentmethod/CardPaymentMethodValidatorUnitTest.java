@@ -66,24 +66,6 @@ class CardPaymentMethodValidatorUnitTest {
     }
 
     @Test
-    void shouldReturnFailWhenCardTokenIsInvalid() {
-        // given
-        var cardMethod = new CardPaymentMethodDTO(PaymentMethodType.CARD, "tok_invalid");
-        var request = getPaymentDTORequestBuilder().paymentMethod(cardMethod).build();
-
-        when(cardClient.validateCard(any(CardValidationRequestDTO.class))).thenReturn(null);
-
-        // when
-        var result = validator.validate(request);
-
-        // then
-        assertAll(
-                () -> assertThat(result.valid()).isFalse(),
-                () -> assertThat(result.reason()).isEqualTo("Invalid card token")
-        );
-    }
-
-    @Test
     void shouldReturnFailWhenCardIsNotActive() {
         // given
         var cardMethod = new CardPaymentMethodDTO(PaymentMethodType.CARD, "tok_expired");

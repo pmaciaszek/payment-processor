@@ -32,6 +32,9 @@
                 referencedColumnNames="id"
                 onDelete="CASCADE"
                 constraintName="fk_user_devices"/>
+        <createIndex tableName="user_devices" indexName="idx_user_devices_user_id">
+            <column name="user_id"/>
+        </createIndex>
     </changeSet>
 
 </databaseChangeLog>

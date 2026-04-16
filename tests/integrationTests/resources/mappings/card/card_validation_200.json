@@ -175,25 +175,6 @@
           }
         }
       }
-    },
-    {
-      "id": "b9a420a0-7248-4ba7-9c56-137f9fb15442",
-      "request": {
-        "method": "POST",
-        "url": "/v1/card/validation",
-        "bodyPatterns": [
-          {
-            "matchesJsonPath": "$[?(@.cardToken =~ /tok_nullresp.*/)]"
-          }
-        ]
-      },
-      "response": {
-        "status": 200,
-        "headers": {
-          "Content-Type": "application/json"
-        },
-        "body": "null"
-      }
     }
   ]
 }

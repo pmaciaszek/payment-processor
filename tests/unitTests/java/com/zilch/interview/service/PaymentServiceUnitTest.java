@@ -18,6 +18,7 @@ import com.zilch.interview.dto.transfer.TransferResponseDTO;
 import com.zilch.interview.entity.UserTransferEntity;
 import com.zilch.interview.enums.TransferStatus;
 import com.zilch.interview.exception.ValidationCheckException;
+import com.zilch.interview.model.CheckResult;
 import com.zilch.interview.model.PaymentResult;
 import com.zilch.interview.service.check.PaymentRequestValidatorService;
 import org.junit.jupiter.api.Test;
@@ -74,13 +75,13 @@ class PaymentServiceUnitTest {
     void shouldNotProcessPaymentWhenValidationFails() {
         // given
         var requestDTO = getPaymentDTORequestBuilder().build();
-        doThrow(ValidationCheckException.empty())
+        doThrow(ValidationCheckException.of(CheckResult.fail("validation error")))
                 .when(validatorService).runChecks(requestDTO);
 
         // when & then
         assertThatThrownBy(() -> paymentService.processPayment(requestDTO))
                 .isInstanceOf(ValidationCheckException.class)
-                .hasMessage("There were some validation errors");
+                .hasMessage("validation error");
 
         verify(validatorService).runChecks(requestDTO);
         verifyNoInteractions(transferClient, transferPersistenceService);

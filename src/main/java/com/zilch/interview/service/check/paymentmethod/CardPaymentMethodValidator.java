@@ -25,9 +25,6 @@ public class CardPaymentMethodValidator implements PaymentMethodValidator<CardPa
     public CheckResult validate(PaymentRequestDTO paymentRequestDTO) {
         var paymentMethod = getPaymentMethod(paymentRequestDTO);
         var validationResult = getValidationResult(paymentMethod.cardToken(), paymentRequestDTO.currency());
-        if (validationResult == null) {
-            return CheckResult.fail("Invalid card token");
-        }
         if (!validationResult.status().isValid()) {
             return CheckResult.fail(validationResult.status().getValidationMessage());
         }

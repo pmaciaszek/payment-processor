@@ -146,22 +146,6 @@ class CardValidationIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    void shouldReturnBadRequestWhenCardValidationReturnsNull() {
-        // given
-        var requestDTO = createRequest("tok_nullresp01", new BigDecimal("50.00"), "GBP");
-
-        // when
-        var response = restTestClient.post(PAYMENTS_ENDPOINT, requestDTO, PaymentProcessorErrorResponseDTO.class);
-
-        // then
-        assertThat(response)
-                .returns(HttpStatus.BAD_REQUEST, ResponseEntity::getStatusCode)
-                .extracting(ResponseEntity::getBody)
-                .extracting(PaymentProcessorErrorResponseDTO::message)
-                .isEqualTo("Invalid card token");
-    }
-
-    @Test
     void shouldReturnInternalServerErrorWhenCardValidationReturns404() {
         // given
         var requestDTO = createRequest("tok_notfound01", new BigDecimal("50.00"), "GBP");

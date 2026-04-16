@@ -10,8 +10,4 @@ public final class ValidationCheckException extends RuntimeException {
     public static ValidationCheckException of(CheckResult checkResult) {
         return new ValidationCheckException(checkResult.reason());
     }
-
-    public static ValidationCheckException empty() {
-        return new ValidationCheckException("There were some validation errors");
-    }
 }
