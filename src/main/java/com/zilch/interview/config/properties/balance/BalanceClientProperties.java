@@ -1,4 +1,4 @@
-package com.zilch.interview.config.properties.dummyDomain;
+package com.zilch.interview.config.properties.balance;
 
 import com.zilch.interview.config.properties.RestClientProperties;
 import lombok.Data;
@@ -8,5 +8,5 @@ import org.springframework.validation.annotation.Validated;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Validated
-public class DummyDomainClientProperties extends RestClientProperties<DummyDomainEndpoints> {
+public class BalanceClientProperties extends RestClientProperties<BalanceEndpoints> {
 }

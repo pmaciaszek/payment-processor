@@ -9,6 +9,10 @@ spring:
 
 application:
   config:
+    rest:
+      clients:
+        balance:
+          host: http://localhost:${wiremock.server.port}
     service:
       operation-lock:
         cache:

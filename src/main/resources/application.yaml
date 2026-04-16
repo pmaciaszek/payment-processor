@@ -25,10 +25,10 @@ application:
       connection-request-timeout: PT30S
       socket-timeout: PT60S
       clients:
-        dummyDomain:
+        balance:
           host: http://localhost:1010
           endpoints:
-            testEndpoint: "/echo/{name}"
+            user-balance: "/v1/balance/{userId}"
     service:
       operation-lock:
         cache:
@@ -36,9 +36,11 @@ application:
           striped-lock-size: 512
           max-size: 10_000
         max-retries: 5
+      velocity-check:
+        max-request-count: 5
 
 management:
   endpoints:
     web:
       exposure:
-        include: metrics
+        include: health,metrics

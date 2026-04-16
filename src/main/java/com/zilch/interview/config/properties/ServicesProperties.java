@@ -8,5 +8,6 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 @ConfigurationProperties(prefix = "application.config.service")
 public record ServicesProperties(
-        @Valid @NestedConfigurationProperty OperationLockServiceProperties operationLock) {
+        @Valid @NestedConfigurationProperty OperationLockServiceProperties operationLock,
+        @Valid @NestedConfigurationProperty VelocityCheckProperties velocityCheck) {
 }

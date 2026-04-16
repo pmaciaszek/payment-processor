@@ -31,6 +31,7 @@ ext {
     guavaVersion = "33.5.0-jre"
     liquibaseSessionLockVersion = "1.6.9"
     liquibaseVersion = "5.0.2"
+    logstashVersion = "9.0"
     postgresVersion = "42.7.9"
     preliquibaseVersion = "2.0.0"
     testcontainersVersion = "1.21.4"
@@ -58,6 +59,7 @@ dependencies {
     implementation "org.liquibase:liquibase-core:$liquibaseVersion"
     implementation "org.postgresql:postgresql:$postgresVersion"
     implementation "com.google.guava:guava:$guavaVersion"
+    implementation "net.logstash.logback:logstash-logback-encoder:$logstashVersion"
 
 
     testAnnotationProcessor 'org.projectlombok:lombok'

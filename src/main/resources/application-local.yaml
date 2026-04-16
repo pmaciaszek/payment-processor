@@ -1,0 +1,16 @@
+spring:
+  jpa:
+    show-sql: true
+
+application:
+  config:
+    rest:
+      clients:
+        balance:
+          host: http://localhost:1010
+
+management:
+  metrics:
+    enable:
+      all: false
+      jvm: false

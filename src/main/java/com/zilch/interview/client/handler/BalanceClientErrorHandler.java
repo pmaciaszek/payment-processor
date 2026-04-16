@@ -1,7 +1,7 @@
 package com.zilch.interview.client.handler;
 
-import com.zilch.interview.dto.DummyDomainErrorResponseDTO;
-import com.zilch.interview.exception.DummyDomainResponseException;
+import com.zilch.interview.dto.balance.BalanceErrorResponseDTO;
+import com.zilch.interview.exception.BalanceResponseException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
@@ -18,7 +18,7 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class DummyDomainClientErrorHandler implements ResponseErrorHandler {
+public class BalanceClientErrorHandler implements ResponseErrorHandler {
 
     private final ObjectMapper objectMapper;
 
@@ -30,16 +30,16 @@ public class DummyDomainClientErrorHandler implements ResponseErrorHandler {
     @Override
     public void handleError(URI url, HttpMethod method, ClientHttpResponse response) throws IOException {
         ResponseErrorHandler.super.handleError(url, method, response);
-        throw new DummyDomainResponseException(readErrorBody(response));
+        throw new BalanceResponseException(readErrorBody(response));
     }
 
-    private DummyDomainErrorResponseDTO readErrorBody(ClientHttpResponse response) throws IOException {
+    private BalanceErrorResponseDTO readErrorBody(ClientHttpResponse response) throws IOException {
         var stringBody = new String(response.getBody().readAllBytes(), StandardCharsets.UTF_8);
         try {
-            return objectMapper.readValue(stringBody, DummyDomainErrorResponseDTO.class);
+            return objectMapper.readValue(stringBody, BalanceErrorResponseDTO.class);
         } catch (JacksonException exception) {
             log.error("Could not deserialize dummy domain error {}", stringBody, exception);
-            return new DummyDomainErrorResponseDTO(
+            return new BalanceErrorResponseDTO(
                     response.getStatusCode().value(),
                     "Unrecognized error occurred.");
         }

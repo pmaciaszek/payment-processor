@@ -1,6 +1,6 @@
 package com.zilch.interview.config;
 
-import com.zilch.interview.client.handler.DummyDomainClientErrorHandler;
+import com.zilch.interview.client.handler.BalanceClientErrorHandler;
 import com.zilch.interview.config.properties.RestClientProperties;
 import com.zilch.interview.config.properties.RestClientsProperties;
 import lombok.RequiredArgsConstructor;
@@ -24,16 +24,16 @@ public class RestClientsConfiguration {
     private final RestClient.Builder restClientBuilder;
 
     @Bean
-    public RestClient dummpyRestClient(RestClientsProperties restClientsProperties,
-                                       DummyDomainClientErrorHandler dummyDomainClientErrorHandler) {
-        return restClientBuilder(restClientsProperties.dummyDomain(), dummyDomainClientErrorHandler)
+    public RestClient balanceRestClient(RestClientsProperties restClientsProperties,
+                                        BalanceClientErrorHandler balanceClientErrorHandler) {
+        return restClientBuilder(restClientsProperties.balance(), balanceClientErrorHandler)
                 .build();
     }
 
     private RestClient.Builder restClientBuilder(RestClientProperties<?> properties, ResponseErrorHandler errorHandler) {
         return restClientBuilder.clone()
                 .defaultStatusHandler(errorHandler)
-                //.requestInterceptor()
+                //.requestInterceptor() outbound logging interceptor should be here
                 .requestFactory(getRequestFactory(closeableHttpClient))
                 .uriBuilderFactory(new DefaultUriBuilderFactory(properties.getHost()))
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)

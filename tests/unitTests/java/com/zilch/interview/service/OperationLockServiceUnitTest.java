@@ -3,6 +3,7 @@ package com.zilch.interview.service;
 import com.zilch.interview.config.properties.OperationLockServiceCacheProperties;
 import com.zilch.interview.config.properties.OperationLockServiceProperties;
 import com.zilch.interview.config.properties.ServicesProperties;
+import com.zilch.interview.config.properties.VelocityCheckProperties;
 import com.zilch.interview.model.IdempotencyKey;
 import com.zilch.interview.model.PaymentResult;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,7 +45,8 @@ class OperationLockServiceUnitTest {
                                 new OperationLockServiceCacheProperties(
                                         32,
                                         100,
-                                        Duration.of(5, ChronoUnit.MINUTES)))));
+                                        Duration.of(5, ChronoUnit.MINUTES))),
+                        new VelocityCheckProperties(2)));
     }
 
     @Test
@@ -98,7 +100,7 @@ class OperationLockServiceUnitTest {
     @Test
     void shouldReturnCachedSuccessResult() {
         //given
-        var key = new IdempotencyKey("success-key", "hash1");
+        var key = new IdempotencyKey("valid-key", "hash1");
         var transactionId = "transaction-1";
         when(supplier.get()).thenReturn(new PaymentResult(true, transactionId));
 
@@ -194,7 +196,7 @@ class OperationLockServiceUnitTest {
         Supplier<PaymentResult> supplier1 = () -> {
             var count = counter1.incrementAndGet();
             return count >= 2
-                    ? new PaymentResult(true, "transaction-success-1")
+                    ? new PaymentResult(true, "transaction-valid-1")
                     : new PaymentResult(false, "transaction-failed-1");
         };
 
@@ -215,7 +217,7 @@ class OperationLockServiceUnitTest {
         assertThat(result1)
                 .isNotNull()
                 .returns(true, PaymentResult::success)
-                .returns("transaction-success-1", PaymentResult::transactionId);
+                .returns("transaction-valid-1", PaymentResult::transactionId);
         assertThat(result2)
                 .isNotNull()
                 .returns(false, PaymentResult::success)

@@ -27,6 +27,7 @@ public class OperationLockService {
         this.cache = Caffeine.newBuilder()
                 .expireAfterWrite(servicesProperties.operationLock().cache().ttl())
                 .maximumSize(servicesProperties.operationLock().cache().maxSize())
+                .recordStats()
                 .build();
         this.locks = Striped.lock(servicesProperties.operationLock().cache().stripedLockSize());
         this.maxRetries = servicesProperties.operationLock().maxRetries();

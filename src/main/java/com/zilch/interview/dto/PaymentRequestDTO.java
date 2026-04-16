@@ -7,13 +7,11 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import lombok.Builder;
 import lombok.NonNull;
-import org.springframework.validation.annotation.Validated;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
 @Builder
-@Validated
 @ValidCurrencyAmount
 public record PaymentRequestDTO(
         @NonNull UUID userId,

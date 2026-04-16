@@ -8,11 +8,20 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 
 @Service
 @RequiredArgsConstructor
 public class IdempotencyKeyFactoryService {
+
+    private static final ThreadLocal<MessageDigest> SHA256_DIGEST = ThreadLocal.withInitial(() -> {
+        try {
+            return MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException exception) {
+            throw new IllegalStateException("SHA-256 no available", exception);
+        }
+    });
 
     private final ObjectMapper objectMapper;
 
@@ -22,7 +31,8 @@ public class IdempotencyKeyFactoryService {
 
     private String hashRequestBody(Object requestBody) {
         try {
-            var digest = MessageDigest.getInstance("SHA-256");
+            var digest = SHA256_DIGEST.get();
+            digest.reset();
 
             return HexFormat.of()
                     .formatHex(digest

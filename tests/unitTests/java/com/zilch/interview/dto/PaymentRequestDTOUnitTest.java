@@ -12,7 +12,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
 import java.util.Locale;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -163,7 +162,7 @@ class PaymentRequestDTOUnitTest {
                 .build();
 
         // when
-        Set<ConstraintViolation<PaymentRequestDTO>> violations = ConstraintValidationProvider.validate(request);
+        var violations = ConstraintValidationProvider.validate(request);
 
         // then
         assertThat(violations)
