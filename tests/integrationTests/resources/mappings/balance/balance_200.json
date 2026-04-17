@@ -61,6 +61,48 @@
           "currency": "USD"
         }
       }
+    },
+    {
+      "id": "cdce7f9d-0859-4314-a3b5-46075ab80e06",
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/v1/balance/[a-f0-9-]{36}",
+        "queryParameters": {
+          "currency": {
+            "equalTo": "AUD"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "jsonBody": {
+          "runningBalance": 100.00,
+          "currency": "AUD"
+        },
+        "fixedDelayMilliseconds": 6000
+      }
+    },
+    {
+      "id": "5f577d07-7582-44c8-9592-554f6d5be830",
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/v1/balance/[a-f0-9-]{36}",
+        "queryParameters": {
+          "currency": {
+            "equalTo": "CAD"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": "not valid json"
+      }
     }
   ]
 }

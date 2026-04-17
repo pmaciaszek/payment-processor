@@ -37,7 +37,7 @@ class ExternalServiceFailureIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    void shouldReturnInternalServerErrorWhenBalanceServiceReturns503() {
+    void shouldReturnServiceUnavailableWhenBalanceServiceReturns503() {
         // given
         var requestDTO = createBalanceRequest("CHF");
 
@@ -46,12 +46,12 @@ class ExternalServiceFailureIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response)
-                .returns(HttpStatus.INTERNAL_SERVER_ERROR, ResponseEntity::getStatusCode);
+                .returns(HttpStatus.SERVICE_UNAVAILABLE, ResponseEntity::getStatusCode);
         assertThat(userTransferRepository.findAll()).isEmpty();
     }
 
     @Test
-    void shouldReturnInternalServerErrorWhenCardServiceReturns503() {
+    void shouldReturnServiceUnavailableWhenCardServiceReturns503() {
         // given
         var requestDTO = createCardRequest("tok_error503001");
 
@@ -60,12 +60,12 @@ class ExternalServiceFailureIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response)
-                .returns(HttpStatus.INTERNAL_SERVER_ERROR, ResponseEntity::getStatusCode);
+                .returns(HttpStatus.SERVICE_UNAVAILABLE, ResponseEntity::getStatusCode);
         assertThat(userTransferRepository.findAll()).isEmpty();
     }
 
     @Test
-    void shouldReturnInternalServerErrorWhenBalanceServiceReturns500() {
+    void shouldReturnServiceUnavailableWhenBalanceServiceReturns500() {
         // given
         var requestDTO = createBalanceRequest("JPY");
 
@@ -74,11 +74,11 @@ class ExternalServiceFailureIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response)
-                .returns(HttpStatus.INTERNAL_SERVER_ERROR, ResponseEntity::getStatusCode);
+                .returns(HttpStatus.SERVICE_UNAVAILABLE, ResponseEntity::getStatusCode);
     }
 
     @Test
-    void shouldReturnInternalServerErrorWhenCardServiceReturns500() {
+    void shouldReturnServiceUnavailableWhenCardServiceReturns500() {
         // given
         var requestDTO = createCardRequest("tok_error500001");
 
@@ -87,7 +87,7 @@ class ExternalServiceFailureIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response)
-                .returns(HttpStatus.INTERNAL_SERVER_ERROR, ResponseEntity::getStatusCode);
+                .returns(HttpStatus.SERVICE_UNAVAILABLE, ResponseEntity::getStatusCode);
     }
 
     @Test
@@ -98,10 +98,9 @@ class ExternalServiceFailureIntegrationTest extends IntegrationTest {
         // when
         var response = restTestClient.post(PAYMENTS_ENDPOINT, requestDTO, PaymentProcessorErrorResponseDTO.class);
 
-        // then
-        assertThat(response)
-                .satisfies(r -> assertThat(r.getStatusCode())
-                        .isIn(HttpStatus.BAD_REQUEST, HttpStatus.INTERNAL_SERVER_ERROR));
+        // then - timeout can result in different error codes depending on where it occurs
+        assertThat(response.getStatusCode())
+                .isIn(HttpStatus.BAD_REQUEST, HttpStatus.SERVICE_UNAVAILABLE, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Test
@@ -112,10 +111,9 @@ class ExternalServiceFailureIntegrationTest extends IntegrationTest {
         // when
         var response = restTestClient.post(PAYMENTS_ENDPOINT, requestDTO, PaymentProcessorErrorResponseDTO.class);
 
-        // then
-        assertThat(response)
-                .satisfies(r -> assertThat(r.getStatusCode())
-                        .isIn(HttpStatus.BAD_REQUEST, HttpStatus.INTERNAL_SERVER_ERROR));
+        // then - timeout can result in different error codes depending on where it occurs
+        assertThat(response.getStatusCode())
+                .isIn(HttpStatus.BAD_REQUEST, HttpStatus.SERVICE_UNAVAILABLE, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Test
@@ -140,7 +138,7 @@ class ExternalServiceFailureIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response)
-                .returns(HttpStatus.INTERNAL_SERVER_ERROR, ResponseEntity::getStatusCode);
+                .returns(HttpStatus.SERVICE_UNAVAILABLE, ResponseEntity::getStatusCode);
     }
 
     @Test
@@ -153,7 +151,7 @@ class ExternalServiceFailureIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response)
-                .returns(HttpStatus.INTERNAL_SERVER_ERROR, ResponseEntity::getStatusCode);
+                .returns(HttpStatus.SERVICE_UNAVAILABLE, ResponseEntity::getStatusCode);
     }
 
     private PaymentRequestDTO createCardRequest(String cardToken) {

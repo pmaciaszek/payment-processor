@@ -146,7 +146,7 @@ class CardValidationIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    void shouldReturnInternalServerErrorWhenCardValidationReturns404() {
+    void shouldReturnServiceUnavailableWhenCardValidationReturns404() {
         // given
         var requestDTO = createRequest("tok_notfound01", new BigDecimal("50.00"), "GBP");
 
@@ -155,7 +155,7 @@ class CardValidationIntegrationTest extends IntegrationTest {
 
         // then
         assertThat(response)
-                .returns(HttpStatus.INTERNAL_SERVER_ERROR, ResponseEntity::getStatusCode);
+                .returns(HttpStatus.SERVICE_UNAVAILABLE, ResponseEntity::getStatusCode);
     }
 
     @Test

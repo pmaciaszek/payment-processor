@@ -2,11 +2,14 @@ package com.zilch.interview.client.handler;
 
 import com.zilch.interview.dto.card.CardErrorResponseDTO;
 import com.zilch.interview.exception.CardResponseException;
+import com.zilch.interview.exception.CardServiceUnavailableException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.logstash.logback.argument.StructuredArguments;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.client.ResponseErrorHandler;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
@@ -29,15 +32,23 @@ public class CardClientErrorHandler implements ResponseErrorHandler {
 
     @Override
     public void handleError(URI url, HttpMethod method, ClientHttpResponse response) throws IOException {
-        throw new CardResponseException(readErrorBody(response));
+        var statusCode = response.getStatusCode();
+        var body = StreamUtils.copyToString(response.getBody(), StandardCharsets.UTF_8);
+        if (statusCode.is4xxClientError()) {
+            throw new CardResponseException(readErrorBody(body));
+        }
+        log.error("Card service responded with status {} for request {} {}.", statusCode,
+                method,
+                url,
+                StructuredArguments.kv("responseBody", body));
+        throw new CardServiceUnavailableException("Card service error: " + statusCode);
     }
 
-    private CardErrorResponseDTO readErrorBody(ClientHttpResponse response) throws IOException {
-        var stringBody = new String(response.getBody().readAllBytes(), StandardCharsets.UTF_8);
+    private CardErrorResponseDTO readErrorBody(String responseBody) {
         try {
-            return objectMapper.readValue(stringBody, CardErrorResponseDTO.class);
+            return objectMapper.readValue(responseBody, CardErrorResponseDTO.class);
         } catch (JacksonException exception) {
-            log.error("Could not deserialize card domain error {}", stringBody, exception);
+            log.error("Could not deserialize card domain error {}", responseBody, exception);
             return new CardErrorResponseDTO("CRD-999", "Unknown error occurred.");
         }
     }

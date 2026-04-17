@@ -2,11 +2,15 @@ package com.zilch.interview.client.handler;
 
 import com.zilch.interview.dto.balance.BalanceErrorResponseDTO;
 import com.zilch.interview.exception.BalanceResponseException;
+import com.zilch.interview.exception.BalanceServiceUnavailableException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.logstash.logback.argument.StructuredArguments;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.client.ResponseErrorHandler;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
@@ -29,17 +33,25 @@ public class BalanceClientErrorHandler implements ResponseErrorHandler {
 
     @Override
     public void handleError(URI url, HttpMethod method, ClientHttpResponse response) throws IOException {
-        throw new BalanceResponseException(readErrorBody(response));
+        var statusCode = response.getStatusCode();
+        var body = StreamUtils.copyToString(response.getBody(), StandardCharsets.UTF_8);
+        if (statusCode.is4xxClientError()) {
+            throw new BalanceResponseException(readErrorBody(statusCode, body));
+        }
+        log.error("Balance service responded with status {} for request {} {}.", statusCode,
+                method,
+                url,
+                StructuredArguments.kv("responseBody", body));
+        throw new BalanceServiceUnavailableException("Balance service error: " + statusCode);
     }
 
-    private BalanceErrorResponseDTO readErrorBody(ClientHttpResponse response) throws IOException {
-        var stringBody = new String(response.getBody().readAllBytes(), StandardCharsets.UTF_8);
+    private BalanceErrorResponseDTO readErrorBody(HttpStatusCode statusCode, String responseBody) {
         try {
-            return objectMapper.readValue(stringBody, BalanceErrorResponseDTO.class);
+            return objectMapper.readValue(responseBody, BalanceErrorResponseDTO.class);
         } catch (JacksonException exception) {
-            log.error("Could not deserialize balance domain error {}", stringBody, exception);
+            log.error("Could not deserialize balance domain error {}", responseBody, exception);
             return new BalanceErrorResponseDTO(
-                    response.getStatusCode().value(),
+                    statusCode.value(),
                     "Unrecognized error occurred.");
         }
     }

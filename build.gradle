@@ -34,6 +34,7 @@ ext {
     logstashVersion = "9.0"
     postgresVersion = "42.7.9"
     preliquibaseVersion = "2.0.0"
+    resilience4jVersion = "2.3.0"
     testcontainersVersion = "1.21.4"
     wiremockVersion = "4.2.1"
 }
@@ -60,7 +61,7 @@ dependencies {
     implementation "org.postgresql:postgresql:$postgresVersion"
     implementation "com.google.guava:guava:$guavaVersion"
     implementation "net.logstash.logback:logstash-logback-encoder:$logstashVersion"
-
+    implementation "io.github.resilience4j:resilience4j-spring-boot3:$resilience4jVersion"
 
     testAnnotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

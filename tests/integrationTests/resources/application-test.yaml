@@ -27,3 +27,16 @@ application:
       operation-lock:
         cache:
           striped-lock-size: 32
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        registerHealthIndicator: false
+        slidingWindowSize: 100
+        minimumNumberOfCalls: 100
+        failureRateThreshold: 100
+  retry:
+    configs:
+      default:
+        maxAttempts: 1

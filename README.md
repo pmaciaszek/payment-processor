@@ -13,6 +13,7 @@ An advanced payment orchestration and processing system designed for high reliab
     *   `DeviceCheck` & `UserCheck`: Verification of account and device status.
     *   `PaymentMethodCheck`: Validation of specific payment methods (Card, BLIK).
 *   **Error Handling:** A global exception handling system providing consistent API responses.
+*   **Resilience:** Circuit Breaker and Retry patterns for external service calls (Balance Service, Card Service) using Resilience4j.
 *   **Persistence:** Tracking transfer statuses (PENDING, CAPTURED, FAILED) in the database.
 
 ## 🏗 Architecture
@@ -32,14 +33,16 @@ The project is built on **Spring Boot 4** and **Java 21**.
 *   **Language:** Java 21+
 *   **Database:** PostgreSQL (handled via Spring Data JPA)
 *   **Migrations:** Liquibase
-*   **Testing:** JUnit 5, Mockito, AssertJ, Wiremock (integration tests)
-*   **Others:** Lombok, Jackson
+*   **Testing:** JUnit 5, Mockito, AssertJ, Wiremock, Testcontainers
+*   **Resilience:** Resilience4j (Circuit Breaker, Retry)
+*   **Others:** Lombok, Jackson, Caffeine (caching)
 
 ## 🚦 Getting Started
 
 ### Requirements
-*   JDK 17 or newer
+*   JDK 21 or newer
 *   Gradle
+*   Docker (for integration tests)
 
 ### Running the application
 ```bash
@@ -75,10 +78,12 @@ Example Request Body (Card):
 }
 ```
 
-## 🛡 Security Mechanisms
+## 🛡 Security & Resilience Mechanisms
 
 1.  **Timeouts:** Each validation check has a defined time limit (default: 5s).
-2.  **Transactional Rollback:** The system ensures data consistency in case of external service failures.
-3.  **Strict Validation:** Use of Bean Validation annotations (`@Valid`) and dedicated validators for card tokens and amounts.
+2.  **Circuit Breaker:** Protects against cascading failures when external services (Balance, Card) are unavailable. Opens after 50% failure rate, transitions to half-open after 30s.
+3.  **Retry with Exponential Backoff:** Automatic retry of failed external calls (max 3 attempts, 500ms initial delay).
+4.  **Transactional Rollback:** The system ensures data consistency in case of external service failures.
+5.  **Strict Validation:** Use of Bean Validation annotations (`@Valid`) and dedicated validators for card tokens and amounts.
 
 ---

@@ -1,10 +1,11 @@
 package com.zilch.interview.exception.handler;
 
-import com.zilch.interview.exception.BalanceResponseException;
-import com.zilch.interview.exception.CardResponseException;
+import com.zilch.interview.exception.BalanceServiceUnavailableException;
+import com.zilch.interview.exception.CardServiceUnavailableException;
 import com.zilch.interview.exception.IdempotencyKeyDuplicationException;
 import com.zilch.interview.exception.PaymentProcessorErrorResponseDTO;
 import com.zilch.interview.exception.ValidationCheckException;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import lombok.extern.slf4j.Slf4j;
 import net.logstash.logback.argument.StructuredArguments;
 import org.springframework.http.HttpHeaders;
@@ -26,9 +27,19 @@ import java.util.stream.Collectors;
 @Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler({BalanceResponseException.class, CardResponseException.class})
+    @ExceptionHandler({BalanceServiceUnavailableException.class, CardServiceUnavailableException.class})
     public ResponseEntity<PaymentProcessorErrorResponseDTO> handleIntegrationExceptions(Exception exception) {
         return logExceptionAndGetResponseDTO(HttpStatus.SERVICE_UNAVAILABLE, exception);
+    }
+
+    @ExceptionHandler(CallNotPermittedException.class)
+    public ResponseEntity<PaymentProcessorErrorResponseDTO> handleCircuitBreakerOpen(CallNotPermittedException exception) {
+        log.warn("Circuit breaker is open: {}", exception.getCausingCircuitBreakerName());
+        return ResponseEntity
+                .status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(new PaymentProcessorErrorResponseDTO(
+                        HttpStatus.SERVICE_UNAVAILABLE.name(),
+                        "Service temporarily unavailable due to high error rate. Please try again later."));
     }
 
     @ExceptionHandler(ValidationCheckException.class)
@@ -41,6 +52,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         Throwable cause = exception.getCause();
         if (cause instanceof ValidationCheckException validationException) {
             return handleValidationCheckException(validationException);
+        }
+        if (cause instanceof BalanceServiceUnavailableException
+                || cause instanceof CardServiceUnavailableException) {
+            return handleIntegrationExceptions((Exception) cause);
+        }
+        if (cause instanceof CallNotPermittedException callNotPermittedException) {
+            return handleCircuitBreakerOpen(callNotPermittedException);
         }
         return logExceptionAndGetResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR, exception);
     }
