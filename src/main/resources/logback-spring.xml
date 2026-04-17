@@ -15,14 +15,9 @@
 
                 <valueMask>
                     <value>^(tok_\w{3})(\w{7})$</value>
-                    <mask>*********$1</mask>
+                    <mask>$1*********</mask>
                 </valueMask>
 
-                <!-- emails -->
-                <valueMask>
-                    <value>(\w{3})([\w\.]*?)(@[\w\.]*?)</value>
-                    <mask>$1********$3</mask>
-                </valueMask>
             </jsonGeneratorDecorator>
 
             <providers>
