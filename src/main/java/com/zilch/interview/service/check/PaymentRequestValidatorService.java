@@ -37,8 +37,8 @@ public class PaymentRequestValidatorService {
     private void performValidationChecks(PaymentRequestDTO requestDTO) {
         var parallelChecks = getChecks(CheckStage.VALIDATION).stream()
                 .map(check -> CompletableFuture.supplyAsync(
-                        () -> check.check(requestDTO),
-                        validationExecutor)
+                                () -> check.check(requestDTO),
+                                validationExecutor)
                         .orTimeout(5, TimeUnit.SECONDS))
                 .toList();
 

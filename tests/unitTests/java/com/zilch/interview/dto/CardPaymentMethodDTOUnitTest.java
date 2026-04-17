@@ -1,11 +1,11 @@
 package com.zilch.interview.dto;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.zilch.interview.enums.PaymentMethodType;
 import com.zilch.interview.utils.ConstraintValidationProvider;
 import jakarta.validation.ConstraintViolation;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class CardPaymentMethodDTOUnitTest {
 

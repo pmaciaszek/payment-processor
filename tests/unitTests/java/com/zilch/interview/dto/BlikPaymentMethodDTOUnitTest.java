@@ -1,7 +1,5 @@
 package com.zilch.interview.dto;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.zilch.interview.enums.PaymentMethodType;
 import com.zilch.interview.utils.ConstraintValidationProvider;
 import jakarta.validation.ConstraintViolation;
@@ -11,6 +9,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Locale;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class BlikPaymentMethodDTOUnitTest {
 

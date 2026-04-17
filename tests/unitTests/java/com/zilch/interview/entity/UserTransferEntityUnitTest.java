@@ -1,13 +1,13 @@
 package com.zilch.interview.entity;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.zilch.interview.enums.TransferStatus;
 import com.zilch.interview.utils.PaymentRequestDTOProvider;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class UserTransferEntityUnitTest {
 

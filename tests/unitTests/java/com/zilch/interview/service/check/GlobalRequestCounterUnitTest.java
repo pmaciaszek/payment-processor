@@ -1,9 +1,5 @@
 package com.zilch.interview.service.check;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.when;
-
 import com.zilch.interview.config.properties.ServicesProperties;
 import com.zilch.interview.config.properties.VelocityCheckProperties;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +11,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class GlobalRequestCounterUnitTest {

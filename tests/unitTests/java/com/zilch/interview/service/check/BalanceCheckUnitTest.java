@@ -1,9 +1,5 @@
 package com.zilch.interview.service.check;
 
-import static com.zilch.interview.utils.PaymentRequestDTOProvider.getPaymentDTORequestBuilder;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
-
 import com.zilch.interview.client.BalanceClient;
 import com.zilch.interview.dto.balance.UserBalanceResponseDTO;
 import com.zilch.interview.enums.CheckStage;
@@ -15,6 +11,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+
+import static com.zilch.interview.utils.PaymentRequestDTOProvider.getPaymentDTORequestBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class BalanceCheckUnitTest {

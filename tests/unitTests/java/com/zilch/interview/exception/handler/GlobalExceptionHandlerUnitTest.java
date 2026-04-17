@@ -1,10 +1,5 @@
 package com.zilch.interview.exception.handler;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import com.zilch.interview.dto.balance.BalanceErrorResponseDTO;
 import com.zilch.interview.dto.card.CardErrorResponseDTO;
 import com.zilch.interview.exception.BalanceResponseException;
@@ -30,6 +25,11 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import java.util.List;
 import java.util.concurrent.CompletionException;
 import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(OutputCaptureExtension.class)
 class GlobalExceptionHandlerUnitTest {
@@ -111,10 +111,10 @@ class GlobalExceptionHandlerUnitTest {
     private static Stream<Arguments> providerForShouldHandleIntegrationExceptions() {
         return Stream.of(
                 Arguments.of(new BalanceResponseException(
-                        new BalanceErrorResponseDTO(500, "Balance integration error")),
+                                new BalanceErrorResponseDTO(500, "Balance integration error")),
                         "500 : Balance integration error"),
                 Arguments.of(new CardResponseException(
-                        new CardErrorResponseDTO("500", "Card integration error")),
+                                new CardErrorResponseDTO("500", "Card integration error")),
                         "500 : Card integration error"));
     }
 
