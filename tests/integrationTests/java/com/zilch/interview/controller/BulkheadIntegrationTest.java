@@ -2,11 +2,7 @@ package com.zilch.interview.controller;
 
 import com.zilch.interview.dto.BlikPaymentMethodDTO;
 import com.zilch.interview.dto.PaymentRequestDTO;
-import com.zilch.interview.entity.UserDeviceEntity;
-import com.zilch.interview.entity.UserDeviceId;
-import com.zilch.interview.entity.UserEntity;
 import com.zilch.interview.enums.PaymentMethodType;
-import com.zilch.interview.enums.UserAccountStatus;
 import com.zilch.interview.utils.base.IntegrationTest;
 import io.github.resilience4j.bulkhead.BulkheadRegistry;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,15 +25,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 })
 class BulkheadIntegrationTest extends IntegrationTest {
 
-    private static final String DEVICE_ID = "device-bulkhead-test";
-
     @Autowired
     private BulkheadRegistry bulkheadRegistry;
 
-    private UserEntity user;
-
     @BeforeEach
-    void setUpUser() {
+    void resetBulkheads() {
         bulkheadRegistry.getAllBulkheads()
                 .forEach(bulkhead -> {
                     while (bulkhead.getMetrics().getAvailableConcurrentCalls()
@@ -45,14 +37,6 @@ class BulkheadIntegrationTest extends IntegrationTest {
                         bulkhead.releasePermission();
                     }
                 });
-
-        user = userRepository.save(UserEntity.builder()
-                .status(UserAccountStatus.ACTIVE)
-                .build());
-        userDeviceRepository.save(UserDeviceEntity.builder()
-                .id(new UserDeviceId(user.getId(), DEVICE_ID))
-                .trusted(true)
-                .build());
     }
 
     @Test
@@ -112,4 +96,3 @@ class BulkheadIntegrationTest extends IntegrationTest {
                 .build();
     }
 }
-

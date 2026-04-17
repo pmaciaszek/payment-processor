@@ -4,11 +4,7 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.zilch.interview.dto.BlikPaymentMethodDTO;
 import com.zilch.interview.dto.PaymentRequestDTO;
 import com.zilch.interview.dto.PaymentResponseDTO;
-import com.zilch.interview.entity.UserDeviceEntity;
-import com.zilch.interview.entity.UserDeviceId;
-import com.zilch.interview.entity.UserEntity;
 import com.zilch.interview.enums.PaymentMethodType;
-import com.zilch.interview.enums.UserAccountStatus;
 import com.zilch.interview.utils.base.IntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,25 +31,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 })
 class RetryIntegrationTest extends IntegrationTest {
 
-    private static final String DEVICE_ID = "device-retry-test";
-
     @InjectWireMock
     private WireMockServer wiremock;
 
-    private UserEntity user;
-
     @BeforeEach
-    void setUpUser() {
+    void resetWiremock() {
         wiremock.resetRequests();
         wiremock.resetScenarios();
-
-        user = userRepository.save(UserEntity.builder()
-                .status(UserAccountStatus.ACTIVE)
-                .build());
-        userDeviceRepository.save(UserDeviceEntity.builder()
-                .id(new UserDeviceId(user.getId(), DEVICE_ID))
-                .trusted(true)
-                .build());
     }
 
     @Test

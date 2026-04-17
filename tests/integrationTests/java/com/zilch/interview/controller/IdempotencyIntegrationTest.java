@@ -2,13 +2,9 @@ package com.zilch.interview.controller;
 
 import com.zilch.interview.dto.CardPaymentMethodDTO;
 import com.zilch.interview.dto.PaymentResponseDTO;
-import com.zilch.interview.entity.UserDeviceEntity;
-import com.zilch.interview.entity.UserDeviceId;
-import com.zilch.interview.entity.UserEntity;
 import com.zilch.interview.entity.UserTransferEntity;
 import com.zilch.interview.enums.PaymentMethodType;
 import com.zilch.interview.enums.TransferStatus;
-import com.zilch.interview.enums.UserAccountStatus;
 import com.zilch.interview.exception.PaymentProcessorErrorResponseDTO;
 import com.zilch.interview.utils.base.IntegrationTest;
 import org.junit.jupiter.api.Test;
@@ -23,19 +19,9 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 class IdempotencyIntegrationTest extends IntegrationTest {
 
-    private static final String DEVICE_ID = "device-idempotency-123";
-
     @Test
     void shouldReturnSameResponseForSameIdempotencyKey() {
         // given
-        var user = userRepository.save(UserEntity.builder()
-                .status(UserAccountStatus.ACTIVE)
-                .build());
-        userDeviceRepository.save(UserDeviceEntity.builder()
-                .id(new UserDeviceId(user.getId(), DEVICE_ID))
-                .trusted(true)
-                .build());
-
         var idempotencyKey = UUID.randomUUID().toString();
         var requestDTO = getPaymentDTORequestBuilder()
                 .userId(user.getId())
@@ -76,14 +62,6 @@ class IdempotencyIntegrationTest extends IntegrationTest {
     @Test
     void shouldReturnConflictWhenSameIdempotencyKeyUsedWithDifferentBody() {
         // given
-        var user = userRepository.save(UserEntity.builder()
-                .status(UserAccountStatus.ACTIVE)
-                .build());
-        userDeviceRepository.save(UserDeviceEntity.builder()
-                .id(new UserDeviceId(user.getId(), DEVICE_ID))
-                .trusted(true)
-                .build());
-
         var idempotencyKey = UUID.randomUUID().toString();
         var expectedMessage = "Idempotency key: %s was used with different request".formatted(idempotencyKey);
         var requestDTO1 = getPaymentDTORequestBuilder()

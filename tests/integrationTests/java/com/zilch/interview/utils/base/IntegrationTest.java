@@ -1,5 +1,9 @@
 package com.zilch.interview.utils.base;
 
+import com.zilch.interview.entity.UserDeviceEntity;
+import com.zilch.interview.entity.UserDeviceId;
+import com.zilch.interview.entity.UserEntity;
+import com.zilch.interview.enums.UserAccountStatus;
 import com.zilch.interview.repository.UserDeviceRepository;
 import com.zilch.interview.repository.UserRepository;
 import com.zilch.interview.repository.UserTransferRepository;
@@ -44,9 +48,20 @@ public abstract class IntegrationTest {
         userDeviceRepository.deleteAll();
         userRepository.deleteAll();
         userTransferRepository.deleteAll();
+
+        user = userRepository.save(UserEntity.builder()
+                .status(UserAccountStatus.ACTIVE)
+                .build());
+        userDeviceRepository.save(UserDeviceEntity.builder()
+                .id(new UserDeviceId(user.getId(), DEVICE_ID))
+                .trusted(true)
+                .build());
     }
 
     protected static final String PAYMENTS_ENDPOINT = "/v1/payments";
+    protected static final String DEVICE_ID = "device-id";
+
+    protected UserEntity user;
 
     @Autowired
     protected RestTestClient restTestClient;

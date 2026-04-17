@@ -8,7 +8,6 @@ import com.zilch.interview.entity.UserTransferEntity;
 import com.zilch.interview.enums.TransferStatus;
 import com.zilch.interview.enums.UserAccountStatus;
 import com.zilch.interview.utils.base.IntegrationTest;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,21 +24,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 class ConcurrencyIntegrationTest extends IntegrationTest {
-
-    private static final String DEVICE_ID = "device-concurrent";
-
-    private UserEntity user;
-
-    @BeforeEach
-    void setUpUser() {
-        user = userRepository.save(UserEntity.builder()
-                .status(UserAccountStatus.ACTIVE)
-                .build());
-        userDeviceRepository.save(UserDeviceEntity.builder()
-                .id(new UserDeviceId(user.getId(), DEVICE_ID))
-                .trusted(true)
-                .build());
-    }
 
     @Test
     void shouldHandleConcurrentRequestsWithSameIdempotencyKey() throws Exception {

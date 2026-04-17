@@ -1,10 +1,6 @@
 package com.zilch.interview.controller;
 
 import com.zilch.interview.dto.PaymentRequestDTO;
-import com.zilch.interview.entity.UserDeviceEntity;
-import com.zilch.interview.entity.UserDeviceId;
-import com.zilch.interview.entity.UserEntity;
-import com.zilch.interview.enums.UserAccountStatus;
 import com.zilch.interview.exception.PaymentProcessorErrorResponseDTO;
 import com.zilch.interview.utils.base.IntegrationTest;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
@@ -32,26 +28,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 })
 class CircuitBreakerIntegrationTest extends IntegrationTest {
 
-    private static final String DEVICE_ID = "device-cb-test";
     private static final String CB_BALANCE_SERVICE = "balanceService";
 
     @Autowired
     private CircuitBreakerRegistry circuitBreakerRegistry;
 
-    private UserEntity user;
-
     @BeforeEach
-    void setUpUser() {
+    void resetCircuitBreakers() {
         circuitBreakerRegistry.getAllCircuitBreakers()
                 .forEach(CircuitBreaker::reset);
-
-        user = userRepository.save(UserEntity.builder()
-                .status(UserAccountStatus.ACTIVE)
-                .build());
-        userDeviceRepository.save(UserDeviceEntity.builder()
-                .id(new UserDeviceId(user.getId(), DEVICE_ID))
-                .trusted(true)
-                .build());
     }
 
     @Test
