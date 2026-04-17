@@ -22,7 +22,6 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 public class RestClientsConfiguration {
 
     private final CloseableHttpClient closeableHttpClient;
-    private final RestClient.Builder restClientBuilder;
 
     @Bean
     public RestClient balanceRestClient(RestClientsProperties restClientsProperties,
@@ -39,7 +38,7 @@ public class RestClientsConfiguration {
     }
 
     private RestClient.Builder restClientBuilder(RestClientProperties<?> properties, ResponseErrorHandler errorHandler) {
-        return restClientBuilder.clone()
+        return RestClient.builder()
                 .defaultStatusHandler(errorHandler)
                 //.requestInterceptor() outbound logging interceptor should be here
                 .requestFactory(getRequestFactory(closeableHttpClient))
