@@ -1,8 +1,5 @@
 package com.zilch.interview.controller;
 
-import static com.zilch.interview.utils.provider.PaymentRequestDTOProvider.getPaymentDTORequestBuilder;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.zilch.interview.dto.BlikPaymentMethodDTO;
 import com.zilch.interview.dto.CardPaymentMethodDTO;
 import com.zilch.interview.entity.UserDeviceEntity;
@@ -20,6 +17,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.math.BigDecimal;
+
+import static com.zilch.interview.utils.provider.PaymentRequestDTOProvider.getPaymentDTORequestBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class RequestValidationIntegrationTest extends IntegrationTest {
 

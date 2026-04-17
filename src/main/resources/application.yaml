@@ -53,6 +53,8 @@ management:
   health:
     circuitbreakers:
       enabled: true
+    bulkheads:
+      enabled: true
 
 resilience4j:
   circuitbreaker:
@@ -88,6 +90,7 @@ resilience4j:
         ignoreExceptions:
           - com.zilch.interview.exception.BalanceResponseException
           - com.zilch.interview.exception.CardResponseException
+          - io.github.resilience4j.bulkhead.BulkheadFullException
     instances:
       balanceService:
         baseConfig: default
@@ -98,6 +101,16 @@ resilience4j:
       default:
         timeoutDuration: 5s
         cancelRunningFuture: true
+    instances:
+      balanceService:
+        baseConfig: default
+      cardService:
+        baseConfig: default
+  bulkhead:
+    configs:
+      default:
+        maxConcurrentCalls: 15
+        maxWaitDuration: 0ms
     instances:
       balanceService:
         baseConfig: default

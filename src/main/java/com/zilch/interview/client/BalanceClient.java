@@ -3,6 +3,7 @@ package com.zilch.interview.client;
 import com.zilch.interview.config.properties.RestClientsProperties;
 import com.zilch.interview.dto.balance.UserBalanceResponseDTO;
 import com.zilch.interview.exception.BalanceServiceUnavailableException;
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class BalanceClient {
     private final RestClient balanceRestClient;
     private final RestClientsProperties restClientsProperties;
 
+    @Bulkhead(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "getUserBalanceFallback")
     @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "getUserBalanceFallback")
     @Retry(name = CIRCUIT_BREAKER_NAME)
     public UserBalanceResponseDTO getUserBalance(UUID userId, String currency) {
@@ -39,8 +41,8 @@ public class BalanceClient {
     }
 
     private UserBalanceResponseDTO getUserBalanceFallback(UUID userId, String currency, Exception exception) {
-        log.error("Circuit breaker fallback triggered for balance service. userId: {}, currency: {}",
-                userId, currency, exception);
+        log.error("Fallback triggered for balance service. userId: {}, currency: {}, cause: {}",
+                userId, currency, exception.getClass().getSimpleName(), exception);
         throw new BalanceServiceUnavailableException(
                 "Balance service is currently unavailable. Please try again later.", exception);
     }

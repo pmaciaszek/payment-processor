@@ -1,8 +1,5 @@
 package com.zilch.interview.controller;
 
-import static com.zilch.interview.utils.provider.PaymentRequestDTOProvider.getPaymentDTORequestBuilder;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.zilch.interview.entity.UserDeviceEntity;
 import com.zilch.interview.entity.UserDeviceId;
 import com.zilch.interview.entity.UserEntity;
@@ -12,6 +9,9 @@ import com.zilch.interview.utils.base.IntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import static com.zilch.interview.utils.provider.PaymentRequestDTOProvider.getPaymentDTORequestBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class DeviceCheckIntegrationTest extends IntegrationTest {
 

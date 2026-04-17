@@ -1,9 +1,5 @@
 package com.zilch.interview.controller;
 
-import static com.zilch.interview.utils.provider.PaymentRequestDTOProvider.getPaymentDTORequestBuilder;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
 import com.zilch.interview.dto.PaymentResponseDTO;
 import com.zilch.interview.entity.UserDeviceEntity;
 import com.zilch.interview.entity.UserDeviceId;
@@ -23,6 +19,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.IntStream;
+
+import static com.zilch.interview.utils.provider.PaymentRequestDTOProvider.getPaymentDTORequestBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class ConcurrencyIntegrationTest extends IntegrationTest {
 

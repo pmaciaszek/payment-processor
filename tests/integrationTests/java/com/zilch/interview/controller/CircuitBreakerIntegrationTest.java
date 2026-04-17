@@ -1,8 +1,5 @@
 package com.zilch.interview.controller;
 
-import static com.zilch.interview.utils.provider.PaymentRequestDTOProvider.getPaymentDTORequestBuilder;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.zilch.interview.dto.PaymentRequestDTO;
 import com.zilch.interview.entity.UserDeviceEntity;
 import com.zilch.interview.entity.UserDeviceId;
@@ -20,6 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
 import java.math.BigDecimal;
+
+import static com.zilch.interview.utils.provider.PaymentRequestDTOProvider.getPaymentDTORequestBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @TestPropertySource(properties = {
         "resilience4j.circuitbreaker.configs.default.slidingWindowSize=5",

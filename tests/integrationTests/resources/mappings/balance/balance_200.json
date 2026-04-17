@@ -103,6 +103,51 @@
         },
         "body": "not valid json"
       }
+    },
+    {
+      "id": "6335d858-1f27-423a-ab69-3e351f5e75cb",
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/v1/balance/[a-f0-9-]{36}",
+        "queryParameters": {
+          "currency": {
+            "equalTo": "SEK"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "jsonBody": {
+          "runningBalance": 500.00,
+          "currency": "SEK"
+        },
+        "fixedDelayMilliseconds": 2000
+      }
+    },
+    {
+      "id": "0440895c-95cc-4a34-81f0-18fb1f67a6c8",
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/v1/balance/[a-f0-9-]{36}",
+        "queryParameters": {
+          "currency": {
+            "equalTo": "DKK"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "jsonBody": {
+          "runningBalance": 400.00,
+          "currency": "DKK"
+        }
+      }
     }
   ]
 }

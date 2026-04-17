@@ -1,0 +1,78 @@
+{
+  "mappings": [
+    {
+      "id": "066f4cc9-b43e-48f9-a37a-2bceaf44d3fc",
+      "scenarioName": "Retry Scenario PLN",
+      "requiredScenarioState": "Started",
+      "newScenarioState": "First Failure",
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/v1/balance/[a-f0-9-]{36}",
+        "queryParameters": {
+          "currency": {
+            "equalTo": "PLN"
+          }
+        }
+      },
+      "response": {
+        "status": 500,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "jsonBody": {
+          "code": 500,
+          "message": "Temporary error"
+        }
+      }
+    },
+    {
+      "id": "6dd2808c-6c28-4c79-ad5b-b241b8560f48",
+      "scenarioName": "Retry Scenario PLN",
+      "requiredScenarioState": "First Failure",
+      "newScenarioState": "Second Failure",
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/v1/balance/[a-f0-9-]{36}",
+        "queryParameters": {
+          "currency": {
+            "equalTo": "PLN"
+          }
+        }
+      },
+      "response": {
+        "status": 500,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "jsonBody": {
+          "code": 500,
+          "message": "Temporary error"
+        }
+      }
+    },
+    {
+      "id": "17c9fdf9-34be-427b-9c2c-666d528505c5",
+      "scenarioName": "Retry Scenario PLN",
+      "requiredScenarioState": "Second Failure",
+      "request": {
+        "method": "GET",
+        "urlPathPattern": "/v1/balance/[a-f0-9-]{36}",
+        "queryParameters": {
+          "currency": {
+            "equalTo": "PLN"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "jsonBody": {
+          "runningBalance": 300.00,
+          "currency": "PLN"
+        }
+      }
+    }
+  ]
+}
