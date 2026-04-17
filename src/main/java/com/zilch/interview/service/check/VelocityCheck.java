@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class VelocityCheck implements PaymentRequestCheck {
+class VelocityCheck implements PaymentRequestCheck {
 
     private final ServicesProperties servicesProperties;
     private final GlobalRequestCounter globalRequestCounter;

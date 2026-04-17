@@ -12,7 +12,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class PaymentMethodCheck implements PaymentRequestCheck {
+class PaymentMethodCheck implements PaymentRequestCheck {
 
     private final List<PaymentMethodValidator<? extends PaymentMethodDTO>> validators;
 

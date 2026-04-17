@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class BalanceCheck implements PaymentRequestCheck {
+class BalanceCheck implements PaymentRequestCheck {
 
     private final BalanceClient balanceClient;
 
